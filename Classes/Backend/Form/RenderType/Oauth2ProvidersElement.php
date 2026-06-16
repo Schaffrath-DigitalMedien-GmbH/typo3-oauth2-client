@@ -9,7 +9,6 @@ use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Imaging\IconSize;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
 use Waldhacker\Oauth2Client\Service\Oauth2ProviderManager;
 
@@ -17,15 +16,12 @@ class Oauth2ProvidersElement extends AbstractFormElement
 {
     private const BE_USERS_TABLE = 'be_users';
     private const FE_USERS_TABLE = 'fe_users';
-    protected IconFactory $iconFactory;
-    private readonly UriBuilder $uriBuilder;
-    private readonly Oauth2ProviderManager $oauth2ProviderManager;
 
-    public function __construct()
-    {
-        $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
-        $this->uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-        $this->oauth2ProviderManager = GeneralUtility::makeInstance(Oauth2ProviderManager::class);
+    public function __construct(
+        protected IconFactory $iconFactory,
+        private readonly UriBuilder $uriBuilder,
+        private readonly Oauth2ProviderManager $oauth2ProviderManager,
+    ) {
     }
 
     /**
@@ -53,7 +49,7 @@ class Oauth2ProvidersElement extends AbstractFormElement
             $lang->sL($languageFile . 'labels.oauth2.disabled'),
             ENT_QUOTES | ENT_HTML5
         );
-        $status = '<span class="badge badge-danger label-space-right t3js-oauth2-status-label" data-alternative-label="'
+        $status = '<span class="badge badge-danger me-2 t3js-oauth2-status-label" data-alternative-label="'
             . $enabledLabel . '">' . $disabledLabel . '</span>';
 
         $configuredProviders = $tableName === self::BE_USERS_TABLE
@@ -75,7 +71,7 @@ class Oauth2ProvidersElement extends AbstractFormElement
             }
 
             if ($activeProviders !== []) {
-                $status = '<span class="badge badge-success label-space-right t3js-oauth2-status-label"'
+                $status = '<span class="badge badge-success me-2 t3js-oauth2-status-label"'
                     . ' data-alternative-label="' . $disabledLabel . '">' . $enabledLabel . '</span>';
 
                 // Add providers list
