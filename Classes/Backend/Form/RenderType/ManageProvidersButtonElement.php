@@ -16,43 +16,52 @@ declare(strict_types=1);
  * The TYPO3 project - inspiring people to share!
  */
 
-namespace Waldhacker\Oauth2Client\Backend\UserSettingsModule;
+namespace Waldhacker\Oauth2Client\Backend\Form\RenderType;
 
-use Doctrine\DBAL\Exception;
+use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
 use TYPO3\CMS\Core\Imaging\IconFactory;
-use TYPO3\CMS\Core\Imaging\Icon;
-use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Imaging\IconSize;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Waldhacker\Oauth2Client\Repository\BackendUserRepository;
 use Waldhacker\Oauth2Client\Service\Oauth2ProviderManager;
 
-class ManageProvidersButtonRenderer
+/**
+ * Custom FormEngine element for the backend user settings module. Renders the status and the
+ * "manage / setup providers" button (formerly handled by the ManageProvidersButtonRenderer userFunc).
+ */
+class ManageProvidersButtonElement extends AbstractFormElement
 {
+
     public function __construct(
+        protected IconFactory $iconFactory,
         private readonly UriBuilder $uriBuilder,
         private readonly BackendUserRepository $backendUserRepository,
         private readonly Oauth2ProviderManager $oauth2ProviderManager,
-        private readonly IconFactory $iconFactory,
-        private readonly Context $context,
+        private readonly Context $context
     ) {
     }
 
     /**
+     * @return array<string, mixed>
      * @throws AspectNotFoundException
      * @throws RouteNotFoundException
-     * @throws Exception
      */
-    public function render(): string
+    public function render(): array
     {
-        $html = '';
+        $resultArray = $this->initializeResultArray();
+
         $languageFile = 'LLL:EXT:oauth2_client/Resources/Private/Language/locallang_be.xlf:';
         $lang = $this->getLanguageService();
-        $userid = (int)$this->context->getPropertyFromAspect('backend.user', 'id');
-        $activeProviders = $this->backendUserRepository->getActiveProviders($userid);
-        $hasActiveProviders = count($activeProviders) > 0;
+        $userId = (int)$this->context->getPropertyFromAspect('backend.user', 'id');
+        $activeProviders = $this->backendUserRepository->getActiveProviders($userId);
+        $hasActiveProviders = $activeProviders !== [];
+
+        $html = '';
+        $html .= $this->renderLabel('oauth2Providers');
         if ($hasActiveProviders) {
             $html .= ' <span class="badge badge-success">'
                 . htmlspecialchars($lang->sL($languageFile . 'oauth2Providers.enabled'), ENT_QUOTES | ENT_HTML5)
@@ -71,23 +80,23 @@ class ManageProvidersButtonRenderer
                     (string)$this->uriBuilder->buildUriFromRoute('oauth2_manage_providers'),
                     ENT_QUOTES | ENT_HTML5
                 )
-                . '" class="btn btn-' . ($activeProviders ? 'default' : 'success') . '">';
-            $html .= $this->iconFactory->getIcon($hasActiveProviders ? 'actions-cog' : 'actions-add', Icon::SIZE_SMALL);
+                . '" class="btn btn-' . ($hasActiveProviders ? 'default' : 'success') . '">';
+            $html .= $this->iconFactory->getIcon(
+                $hasActiveProviders ? 'actions-cog' : 'actions-add',
+                IconSize::SMALL
+            )->render();
             $html .= ' <span>'
                 . htmlspecialchars(
                     $lang->sL(
-                        $languageFile . 'oauth2Providers.' . ($activeProviders ? 'manageLinkTitle' : 'setupLinkTitle')
+                        $languageFile . 'oauth2Providers.' . ($hasActiveProviders ? 'manageLinkTitle' : 'setupLinkTitle')
                     ),
                     ENT_QUOTES | ENT_HTML5
                 )
                 . '</span>';
             $html .= '</a>';
         }
-        return $html;
-    }
 
-    private function getLanguageService(): LanguageService
-    {
-        return $GLOBALS['LANG'];
+        $resultArray['html'] = $html;
+        return $resultArray;
     }
 }

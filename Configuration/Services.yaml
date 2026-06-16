@@ -22,9 +22,6 @@ services:
   Waldhacker\Oauth2Client\Backend\SiteConfig\ConfiguredFrontendProvidersItemsProcFunc:
     public: true
 
-  Waldhacker\Oauth2Client\Backend\UserSettingsModule\ManageProvidersButtonRenderer:
-    public: true
-
   Waldhacker\Oauth2Client\Controller\Backend\ManageProvidersController:
     public: true
 
