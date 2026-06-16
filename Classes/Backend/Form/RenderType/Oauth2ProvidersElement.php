@@ -67,7 +67,7 @@ class Oauth2ProvidersElement extends AbstractFormElement
             $lang->sL($languageFile . 'labels.oauth2.disabled'),
             ENT_QUOTES | ENT_HTML5
         );
-        $status = '<span class="label label-danger label-space-right t3js-oauth2-status-label" data-alternative-label="'
+        $status = '<span class="badge badge-danger label-space-right t3js-oauth2-status-label" data-alternative-label="'
             . $enabledLabel . '">' . $disabledLabel . '</span>';
 
         $configuredProviders = $tableName === self::BE_USERS_TABLE
@@ -89,7 +89,7 @@ class Oauth2ProvidersElement extends AbstractFormElement
             }
 
             if ($activeProviders !== []) {
-                $status = '<span class="label label-success label-space-right t3js-oauth2-status-label"'
+                $status = '<span class="badge badge-success label-space-right t3js-oauth2-status-label"'
                     . ' data-alternative-label="' . $disabledLabel . '">' . $enabledLabel . '</span>';
 
                 // Add providers list
@@ -166,6 +166,8 @@ class Oauth2ProvidersElement extends AbstractFormElement
         }
         $fieldId = 't3js-form-field-oauth2-id' . StringUtility::getUniqueId('-');
 
+        $html[] = $this->renderLabel($fieldId);
+        $html[] = $status;
         $html[] = '<div class="formengine-field-item t3js-formengine-field-item" id="'
             . htmlspecialchars($fieldId) . '">';
         $html[] = '<div class="form-control-wrap" style="max-width: '
@@ -178,7 +180,7 @@ class Oauth2ProvidersElement extends AbstractFormElement
         $html[] = '</div>';
         $html[] = '</div>';
 
-        $resultArray['html'] = $status . implode(PHP_EOL, $html);
+        $resultArray['html'] = implode(PHP_EOL, $html);
         return $resultArray;
     }
 }
