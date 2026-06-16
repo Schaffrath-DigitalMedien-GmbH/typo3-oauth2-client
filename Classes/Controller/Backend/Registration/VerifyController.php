@@ -29,24 +29,28 @@ use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
 use TYPO3\CMS\Core\Context\Exception\AspectPropertyNotFoundException;
 use TYPO3\CMS\Core\Context\UserAspect;
+use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Session\Backend\Exception\SessionNotCreatedException;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Waldhacker\Oauth2Client\Controller\Backend\AbstractBackendController;
 use Waldhacker\Oauth2Client\Repository\BackendUserRepository;
 use Waldhacker\Oauth2Client\Service\Oauth2ProviderManager;
 use Waldhacker\Oauth2Client\Service\Oauth2Service;
 use Waldhacker\Oauth2Client\Session\SessionManager;
 
-class VerifyController extends AbstractBackendController
+readonly class VerifyController
 {
     public function __construct(
-        private readonly Oauth2Service $oauth2Service,
-        private readonly BackendUserRepository $backendUserRepository,
-        private readonly SessionManager $sessionManager,
-        private readonly UriBuilder $uriBuilder,
-        private readonly ResponseFactoryInterface $responseFactory,
-        private readonly Oauth2ProviderManager $oauth2ProviderManager,
-        private readonly Context $context
+        private Oauth2Service $oauth2Service,
+        private BackendUserRepository $backendUserRepository,
+        private SessionManager $sessionManager,
+        private UriBuilder $uriBuilder,
+        private ResponseFactoryInterface $responseFactory,
+        private Oauth2ProviderManager $oauth2ProviderManager,
+        private Context $context
     ) {
     }
 
@@ -149,5 +153,21 @@ class VerifyController extends AbstractBackendController
             ->withHeader('location', (string)$this->uriBuilder->buildUriFromRoute('oauth2_manage_providers'));
 
         return $this->sessionManager->appendRemoveOAuth2CookieToResponse($response, $request);
+    }
+
+    protected function addFlashMessage(
+        string $message,
+        string $title = '',
+        ContextualFeedbackSeverity $severity = ContextualFeedbackSeverity::INFO
+    ): void {
+        $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
+        $flashMessageService->getMessageQueueByIdentifier()->enqueue(
+            GeneralUtility::makeInstance(FlashMessage::class, $message, $title, $severity, true)
+        );
+    }
+
+    protected function getLanguageService(): LanguageService
+    {
+        return $GLOBALS['LANG'];
     }
 }
