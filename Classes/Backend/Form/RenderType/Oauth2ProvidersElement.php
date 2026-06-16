@@ -19,11 +19,10 @@ declare(strict_types=1);
 namespace Waldhacker\Oauth2Client\Backend\Form\RenderType;
 
 use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
-use TYPO3\CMS\Backend\Form\NodeFactory;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
-use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
 use Waldhacker\Oauth2Client\Service\Oauth2ProviderManager;
@@ -32,21 +31,13 @@ class Oauth2ProvidersElement extends AbstractFormElement
 {
     private const BE_USERS_TABLE = 'be_users';
     private const FE_USERS_TABLE = 'fe_users';
-    /**
-     * This property is declared for TYPO3 v13, but without type hint for TYPO3 v12 compatibility
-     * @var IconFactory
-     */
-    protected $iconFactory;
+    protected IconFactory $iconFactory;
     private readonly UriBuilder $uriBuilder;
     private readonly Oauth2ProviderManager $oauth2ProviderManager;
 
-    public function __construct(?NodeFactory $nodeFactory = null, array $data = [])
+    public function __construct()
     {
-        if (is_callable(parent::class . '::__construct')) {
-            // @TODO remove once TYPO3 v12 compatibility is dropped
-            parent::__construct($nodeFactory, $data);
-        }
-        $this->iconFactory ??= GeneralUtility::makeInstance(IconFactory::class);
+        $this->iconFactory = GeneralUtility::makeInstance(IconFactory::class);
         $this->uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
         $this->oauth2ProviderManager = GeneralUtility::makeInstance(Oauth2ProviderManager::class);
     }
@@ -109,7 +100,7 @@ class Oauth2ProvidersElement extends AbstractFormElement
                         . '" style="line-height: 2.1em;">';
                     $childHtml[] = $this->iconFactory->getIcon(
                         $activeProvider['providerConfiguration']->getIconIdentifier(),
-                        Icon::SIZE_SMALL
+                        IconSize::SMALL
                     );
                     $childHtml[] = htmlspecialchars(
                         $lang->sL($activeProvider['providerConfiguration']->getLabel()),
@@ -166,7 +157,7 @@ class Oauth2ProvidersElement extends AbstractFormElement
                                    ) .
                                    '"';
                     $childHtml[] = '>';
-                    $childHtml[] = $this->iconFactory->getIcon('actions-delete', Icon::SIZE_SMALL)->render('inline');
+                    $childHtml[] = $this->iconFactory->getIcon('actions-delete', IconSize::SMALL)->render('inline');
                     $childHtml[] = '</a>';
                     $childHtml[] = '</li>';
                 }
