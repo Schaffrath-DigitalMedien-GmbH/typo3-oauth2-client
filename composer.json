@@ -24,14 +24,14 @@
         "issues": "https://gitlab.com/co-stack.com/co-stack.com/typo3-extensions/typo3-oauth2-client/-/issues"
     },
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-pdo": "*",
         "league/oauth2-client": "^2.7",
         "psr/log": "*",
-        "typo3/cms-backend": "^12.4@dev || ^13.4@dev",
-        "typo3/cms-core": "^12.4@dev || ^13.4@dev",
-        "typo3/cms-fluid": "^12.4@dev || ^13.4@dev",
-        "typo3/cms-setup": "^12.4@dev || ^13.4@dev"
+        "typo3/cms-backend": "^13.4@dev || ^14.2@dev",
+        "typo3/cms-core": "^13.4@dev || ^14.2@dev",
+        "typo3/cms-fluid": "^13.4@dev || ^14.2@dev",
+        "typo3/cms-setup": "^13.4@dev || ^14.2@dev"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.23",
