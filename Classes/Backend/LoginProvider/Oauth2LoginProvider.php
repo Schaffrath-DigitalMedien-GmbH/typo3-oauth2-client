@@ -6,13 +6,10 @@ namespace Waldhacker\Oauth2Client\Backend\LoginProvider;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use TYPO3\CMS\Backend\Controller\LoginController;
 use TYPO3\CMS\Backend\LoginProvider\LoginProviderInterface;
-use TYPO3\CMS\Backend\View\BackendViewFactory;
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException;
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExistException;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
-use TYPO3\CMS\Core\Page\PageRenderer;
 use TYPO3\CMS\Core\View\ViewInterface;
 use TYPO3\CMS\Fluid\View\FluidViewAdapter;
 use Waldhacker\Oauth2Client\Service\Oauth2ProviderManager;
@@ -28,49 +25,46 @@ class Oauth2LoginProvider implements LoginProviderInterface
     ) {
     }
 
-    /**
-     * @throws ExtensionConfigurationPathDoesNotExistException
-     * @throws ExtensionConfigurationExtensionNotConfiguredException
-     */
-    public function render(PageRenderer $pageRenderer, LoginController $loginController): void
-    {
-        //$extensionConfiguration = $this->extensionConfiguration->get('oauth2_client');
-        //
-        //$view = $this->backendViewFactory->create()
-        //$view->setLayoutRootPaths(array_merge(
-        //    $view->getLayoutRootPaths(),
-        //    ['EXT:oauth2_client/Resources/Private/Layouts/Backend/'],
-        //    $extensionConfiguration['view']['layoutRootPaths'] ?? []
-        //));
-        //
-        //$view->setTemplateRootPaths(array_merge(
-        //    $view->getTemplateRootPaths(),
-        //    ['EXT:oauth2_client/Resources/Private/Templates/Backend/'],
-        //    $extensionConfiguration['view']['templateRootPaths'] ?? []
-        //));
-        //
-        //$view->setPartialRootPaths(array_merge(
-        //    $view->getPartialRootPaths(),
-        //    ['EXT:oauth2_client/Resources/Private/Partials/Backend/'],
-        //    $extensionConfiguration['view']['partialRootPaths'] ?? []
-        //));
-        //
-        //$view->setTemplate($extensionConfiguration['view']['template'] ?? 'Oauth2LoginProvider');
-        //
-        //$view->assign('providers', $this->oauth2ProviderManager->getConfiguredBackendProviders());
-    }
-
     public function modifyView(ServerRequestInterface $request, ViewInterface $view): string
     {
+        $viewConfiguration = $this->getViewConfiguration();
+
         if ($view instanceof FluidViewAdapter) {
             $templatePaths = $view->getRenderingContext()->getTemplatePaths();
-            $templateRootPaths = $templatePaths->getTemplateRootPaths();
-            $templateRootPaths[] = 'EXT:oauth2_client/Resources/Private/Templates/Backend/';
-            $templatePaths->setTemplateRootPaths($templateRootPaths);
+
+            $templatePaths->setTemplateRootPaths(array_merge(
+                $templatePaths->getTemplateRootPaths(),
+                ['EXT:oauth2_client/Resources/Private/Templates/Backend/'],
+                $viewConfiguration['templateRootPaths'] ?? []
+            ));
+            $templatePaths->setLayoutRootPaths(array_merge(
+                $templatePaths->getLayoutRootPaths(),
+                ['EXT:oauth2_client/Resources/Private/Layouts/Backend/'],
+                $viewConfiguration['layoutRootPaths'] ?? []
+            ));
+            $templatePaths->setPartialRootPaths(array_merge(
+                $templatePaths->getPartialRootPaths(),
+                ['EXT:oauth2_client/Resources/Private/Partials/Backend/'],
+                $viewConfiguration['partialRootPaths'] ?? []
+            ));
         }
 
         $view->assign('providers', $this->oauth2ProviderManager->getConfiguredBackendProviders());
 
-        return 'Oauth2LoginProvider';
+        return $viewConfiguration['template'] ?? 'Oauth2LoginProvider';
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getViewConfiguration(): array
+    {
+        try {
+            $extensionConfiguration = $this->extensionConfiguration->get('oauth2_client');
+        } catch (ExtensionConfigurationExtensionNotConfiguredException | ExtensionConfigurationPathDoesNotExistException) {
+            return [];
+        }
+
+        return is_array($extensionConfiguration['view'] ?? null) ? $extensionConfiguration['view'] : [];
     }
 }
