@@ -14,7 +14,7 @@ use Waldhacker\Oauth2Client\Database\Query\Restriction\Oauth2FeUserProviderConfi
 
 defined('TYPO3') || die();
 
-(static function () {
+(static function (): void {
     ExtensionManagementUtility::addService(
         'oauth2_client',
         'auth',
@@ -28,7 +28,7 @@ defined('TYPO3') || die();
             'quality' => 50,
             'os' => '',
             'exec' => '',
-            'className' => BackendAuthenticationService::class
+            'className' => BackendAuthenticationService::class,
         ]
     );
 
@@ -45,7 +45,7 @@ defined('TYPO3') || die();
             'quality' => 50,
             'os' => '',
             'exec' => '',
-            'className' => FrontendAuthenticationService::class
+            'className' => FrontendAuthenticationService::class,
         ]
     );
 
@@ -53,8 +53,7 @@ defined('TYPO3') || die();
         'oauth2Client',
         'ManageProviders',
         [ManageProvidersController::class => 'list,deactivate'],
-        [ManageProvidersController::class => 'list,deactivate'],
-        ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT
+        [ManageProvidersController::class => 'list,deactivate']
     );
 
     $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['backend']['loginProviders'][Oauth2LoginProvider::PROVIDER_ID] = [
@@ -90,6 +89,5 @@ defined('TYPO3') || die();
     $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['checkModifyAccessList'][1625556930]
         = DataHandlerHook::class;
 
-    $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client']
-        = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] ?? [];
+    $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] ??= [];
 })();

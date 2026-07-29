@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Waldhacker\Oauth2Client\Middleware\Backend\BeforeAuthenticationHandler as BackendBeforeAuthenticationHandler;
 use Waldhacker\Oauth2Client\Middleware\Frontend\AfterAuthenticationHandler;
 use Waldhacker\Oauth2Client\Middleware\Frontend\BeforeAuthenticationHandler as FrontendBeforeAuthenticationHandler;

@@ -20,9 +20,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class Oauth2FeUserProviderConfigurationRestriction implements QueryRestriction, EnforceableQueryRestriction
 {
-    private const OAUTH2_FE_TABLE = 'tx_oauth2_feuser_provider_configuration';
-    private int $frontendUserId;
-    private bool $isBackendUser;
+    private const string OAUTH2_FE_TABLE = 'tx_oauth2_feuser_provider_configuration';
+    private int $frontendUserId = 0;
+    private bool $isBackendUser = false;
 
     /**
      * @throws AspectNotFoundException
@@ -30,10 +30,7 @@ class Oauth2FeUserProviderConfigurationRestriction implements QueryRestriction, 
     public function __construct(?Context $context = null)
     {
         /** @var Context $context */
-        $context = $context ?? GeneralUtility::makeInstance(Context::class);
-
-        $this->frontendUserId = 0;
-        $this->isBackendUser = false;
+        $context ??= GeneralUtility::makeInstance(Context::class);
         if ($context->hasAspect('frontend.user')) {
             $this->frontendUserId = (int)$context->getPropertyFromAspect('frontend.user', 'id');
         }

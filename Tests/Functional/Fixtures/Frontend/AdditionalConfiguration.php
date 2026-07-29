@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-defined('TYPO3') or die();
+use Waldhacker\Oauth2Client\Service\Oauth2ProviderManager;
+
+defined('TYPO3') || die();
 
 $GLOBALS['TYPO3_CONF_VARS']['BE']['cookieSameSite'] = 'lax';
 $GLOBALS['TYPO3_CONF_VARS']['BE']['loginRateLimit'] = 0;
@@ -17,8 +19,8 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                 'iconIdentifier' => 'oauth2-gitlab',
                 'description' => 'Login with Gitlab0 FE/BE',
                 'scopes' => [
-                    \Waldhacker\Oauth2Client\Service\Oauth2ProviderManager::SCOPE_FRONTEND,
-                    \Waldhacker\Oauth2Client\Service\Oauth2ProviderManager::SCOPE_BACKEND,
+                    Oauth2ProviderManager::SCOPE_FRONTEND,
+                    Oauth2ProviderManager::SCOPE_BACKEND,
                 ],
                 'options' => [
                     'clientId' => '0000000000000000000000000000000000000000000000000000000000000000',
@@ -27,7 +29,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                     'urlAccessToken' => 'https://gitlab0/oauth/token',
                     'urlResourceOwnerDetails' => 'https://gitlab0/api/v4/user',
                     'scopes' => ['openid', 'read_user'],
-                    'scopeSeparator' => ' '
+                    'scopeSeparator' => ' ',
                 ],
             ],
             'gitlab1-fe' => [
@@ -35,7 +37,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                 'iconIdentifier' => 'oauth2-gitlab',
                 'description' => 'Login with Gitlab1 FE',
                 'scopes' => [
-                    \Waldhacker\Oauth2Client\Service\Oauth2ProviderManager::SCOPE_FRONTEND,
+                    Oauth2ProviderManager::SCOPE_FRONTEND,
                 ],
                 'options' => [
                     'clientId' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -44,7 +46,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                     'urlAccessToken' => 'https://gitlab1/oauth/token',
                     'urlResourceOwnerDetails' => 'https://gitlab1/api/v4/user',
                     'scopes' => ['openid', 'read_user'],
-                    'scopeSeparator' => ' '
+                    'scopeSeparator' => ' ',
                 ],
             ],
             'gitlab2-be' => [
@@ -52,7 +54,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                 'iconIdentifier' => 'oauth2-gitlab',
                 'description' => 'Login with Gitlab2 BE',
                 'scopes' => [
-                    \Waldhacker\Oauth2Client\Service\Oauth2ProviderManager::SCOPE_BACKEND,
+                    Oauth2ProviderManager::SCOPE_BACKEND,
                 ],
                 'options' => [
                     'clientId' => 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
@@ -61,7 +63,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                     'urlAccessToken' => 'https://gitlab2/oauth/token',
                     'urlResourceOwnerDetails' => 'https://gitlab2/api/v4/user',
                     'scopes' => ['openid', 'read_user'],
-                    'scopeSeparator' => ' '
+                    'scopeSeparator' => ' ',
                 ],
             ],
             'gitlab3-both' => [
@@ -69,8 +71,8 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                 'iconIdentifier' => 'oauth2-gitlab',
                 'description' => 'Login with Gitlab3 FE/BE',
                 'scopes' => [
-                    \Waldhacker\Oauth2Client\Service\Oauth2ProviderManager::SCOPE_FRONTEND,
-                    \Waldhacker\Oauth2Client\Service\Oauth2ProviderManager::SCOPE_BACKEND,
+                    Oauth2ProviderManager::SCOPE_FRONTEND,
+                    Oauth2ProviderManager::SCOPE_BACKEND,
                 ],
                 'options' => [
                     'clientId' => 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
@@ -79,7 +81,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                     'urlAccessToken' => 'https://gitlab3/oauth/token',
                     'urlResourceOwnerDetails' => 'https://gitlab3/api/v4/user',
                     'scopes' => ['openid', 'read_user'],
-                    'scopeSeparator' => ' '
+                    'scopeSeparator' => ' ',
                 ],
             ],
             'gitlab4-fe' => [
@@ -87,7 +89,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                 'iconIdentifier' => 'oauth2-gitlab',
                 'description' => 'Login with Gitlab4 FE',
                 'scopes' => [
-                    \Waldhacker\Oauth2Client\Service\Oauth2ProviderManager::SCOPE_FRONTEND,
+                    Oauth2ProviderManager::SCOPE_FRONTEND,
                 ],
                 'options' => [
                     'clientId' => 'dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
@@ -96,7 +98,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                     'urlAccessToken' => 'https://gitlab4/oauth/token',
                     'urlResourceOwnerDetails' => 'https://gitlab4/api/v4/user',
                     'scopes' => ['openid', 'read_user'],
-                    'scopeSeparator' => ' '
+                    'scopeSeparator' => ' ',
                 ],
             ],
             'gitlab5-be' => [
@@ -104,7 +106,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                 'iconIdentifier' => 'oauth2-gitlab',
                 'description' => 'Login with Gitlab5 BE',
                 'scopes' => [
-                    \Waldhacker\Oauth2Client\Service\Oauth2ProviderManager::SCOPE_BACKEND,
+                    Oauth2ProviderManager::SCOPE_BACKEND,
                 ],
                 'options' => [
                     'clientId' => 'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
@@ -113,7 +115,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                     'urlAccessToken' => 'https://gitlab5/oauth/token',
                     'urlResourceOwnerDetails' => 'https://gitlab5/api/v4/user',
                     'scopes' => ['openid', 'read_user'],
-                    'scopeSeparator' => ' '
+                    'scopeSeparator' => ' ',
                 ],
             ],
             'gitlab6-both' => [
@@ -121,8 +123,8 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                 'iconIdentifier' => 'oauth2-gitlab',
                 'description' => 'Login with Gitlab6 FE/BE',
                 'scopes' => [
-                    \Waldhacker\Oauth2Client\Service\Oauth2ProviderManager::SCOPE_FRONTEND,
-                    \Waldhacker\Oauth2Client\Service\Oauth2ProviderManager::SCOPE_BACKEND,
+                    Oauth2ProviderManager::SCOPE_FRONTEND,
+                    Oauth2ProviderManager::SCOPE_BACKEND,
                 ],
                 'options' => [
                     'clientId' => 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
@@ -131,7 +133,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                     'urlAccessToken' => 'https://gitlab6/oauth/token',
                     'urlResourceOwnerDetails' => 'https://gitlab6/api/v4/user',
                     'scopes' => ['openid', 'read_user'],
-                    'scopeSeparator' => ' '
+                    'scopeSeparator' => ' ',
                 ],
             ],
             'gitlab7-fe' => [
@@ -139,7 +141,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                 'iconIdentifier' => 'oauth2-gitlab',
                 'description' => 'Login with Gitlab7 FE',
                 'scopes' => [
-                    \Waldhacker\Oauth2Client\Service\Oauth2ProviderManager::SCOPE_FRONTEND,
+                    Oauth2ProviderManager::SCOPE_FRONTEND,
                 ],
                 'options' => [
                     'clientId' => '9999999999999999999999999999999999999999999999999999999999999999',
@@ -148,7 +150,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                     'urlAccessToken' => 'https://gitlab7/oauth/token',
                     'urlResourceOwnerDetails' => 'https://gitlab7/api/v4/user',
                     'scopes' => ['openid', 'read_user'],
-                    'scopeSeparator' => ' '
+                    'scopeSeparator' => ' ',
                 ],
             ],
             'gitlab8-fe' => [
@@ -156,7 +158,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                 'iconIdentifier' => 'oauth2-gitlab',
                 'description' => 'Login with Gitlab8 FE',
                 'scopes' => [
-                    \Waldhacker\Oauth2Client\Service\Oauth2ProviderManager::SCOPE_FRONTEND,
+                    Oauth2ProviderManager::SCOPE_FRONTEND,
                 ],
                 'options' => [
                     'clientId' => '7777777777777777777777777777777777777777777777777777777777777777',
@@ -165,7 +167,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['oauth2_client'] = array_replace_recur
                     'urlAccessToken' => 'https://gitlab8/oauth/token',
                     'urlResourceOwnerDetails' => 'https://gitlab8/api/v4/user',
                     'scopes' => ['openid', 'read_user'],
-                    'scopeSeparator' => ' '
+                    'scopeSeparator' => ' ',
                 ],
             ],
         ],

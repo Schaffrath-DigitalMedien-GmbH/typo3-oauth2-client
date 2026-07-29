@@ -2,8 +2,8 @@
 
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
-defined('TYPO3') or die();
+defined('TYPO3') || die();
 
-(static function () {
+(static function (): void {
     ExtensionManagementUtility::addStaticFile('oauth2_client', 'Configuration/TypoScript', 'OAuth2 templates');
 })();

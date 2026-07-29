@@ -21,7 +21,6 @@ namespace Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling;
 use GuzzleHttp\Cookie\SetCookie;
 use PHPUnit\Util\PHP\AbstractPhpProcess;
 use SebastianBergmann\Template\Template;
-use Text_Template;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestContext;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalResponse;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalResponseException;
@@ -33,36 +32,36 @@ trait Typo3RequestAwareTestTrait
     public function fetchFrontendPageContens(
         ExtendedInternalRequest $request,
         bool $followRedirects = true,
-        InternalRequestContext $requestContext = null
+        ?InternalRequestContext $requestContext = null
     ): array {
-        $requestContext = $requestContext ?? $this->buildRequestContext();
+        $requestContext ??= $this->buildRequestContext();
         $responseData = $this->executeRequest($request, $requestContext, false, $followRedirects);
 
         return [
             'response' => $responseData['response'],
             'cookieData' => $responseData['cookieData'],
-            'pageMarkup' => (string)$responseData['response']->getBody()
+            'pageMarkup' => (string)$responseData['response']->getBody(),
         ];
     }
 
     public function fetchBackendPageContens(
         ExtendedInternalRequest $request,
         bool $followRedirects = true,
-        InternalRequestContext $requestContext = null
+        ?InternalRequestContext $requestContext = null
     ): array {
-        $requestContext = $requestContext ?? $this->buildRequestContext();
+        $requestContext ??= $this->buildRequestContext();
         $responseData = $this->executeRequest($request, $requestContext, true, $followRedirects);
 
         return [
             'response' => $responseData['response'],
             'cookieData' => $responseData['cookieData'],
-            'pageMarkup' => (string)$responseData['response']->getBody()
+            'pageMarkup' => (string)$responseData['response']->getBody(),
         ];
     }
 
     public function buildGetRequest(?string $uri = null, array $cookieData = []): ExtendedInternalRequest
     {
-        return (new ExtendedInternalRequest($uri))->withCookieParams($cookieData);
+        return new ExtendedInternalRequest($uri)->withCookieParams($cookieData);
     }
 
     public function buildPostRequest(
@@ -79,7 +78,7 @@ trait Typo3RequestAwareTestTrait
 
     public function buildRequestContext(array $globalSettings = []): InternalRequestContext
     {
-        return (new InternalRequestContext())->withGlobalSettings(array_replace_recursive(
+        return new InternalRequestContext()->withGlobalSettings(array_replace_recursive(
             ['TYPO3_CONF_VARS' => self::DEFAULT_TYPO3_CONF_VARS],
             $globalSettings
         ));
@@ -87,11 +86,11 @@ trait Typo3RequestAwareTestTrait
 
     private function executeRequest(
         ExtendedInternalRequest $request,
-        InternalRequestContext $requestContext = null,
+        ?InternalRequestContext $requestContext = null,
         bool $isBackendRequest = false,
         bool $followRedirects = true
     ): array {
-        $requestContext = $requestContext ?? $this->buildRequestContext();
+        $requestContext ??= $this->buildRequestContext();
 
         $cookieData = $request->getCookieParams();
         $locationHeaders = [];
@@ -111,16 +110,16 @@ trait Typo3RequestAwareTestTrait
             }
             $locationHeaders[] = $locationHeader;
 
-            $cookies = array_map(fn (string $cookie): SetCookie => SetCookie::fromString($cookie), $response->getHeader('Set-Cookie'));
+            $cookies = array_map(SetCookie::fromString(...), $response->getHeader('Set-Cookie'));
             $cookieData = array_filter(
                 array_replace_recursive(
                     $cookieData,
                     array_combine(
-                        array_map(fn (SetCookie $cookie): string => $cookie->getName(), $cookies),
-                        array_map(fn (SetCookie $cookie): string => $cookie->getValue(), $cookies)
+                        array_map(fn(SetCookie $cookie): string => $cookie->getName(), $cookies),
+                        array_map(fn(SetCookie $cookie): string => $cookie->getValue(), $cookies)
                     )
                 ),
-                fn (string $value): bool => $value !== 'deleted'
+                fn(string $value): bool => $value !== 'deleted'
             );
 
             $request = $this->buildGetRequest($locationHeader, $cookieData);
@@ -142,7 +141,7 @@ trait Typo3RequestAwareTestTrait
             'context' => json_encode($requestContext),
         ];
 
-        $templateClass = Text_Template::class;
+        $templateClass = \Text_Template::class;
         if (!class_exists($templateClass)) {
             $templateClass = Template::class;
         }
@@ -157,7 +156,7 @@ trait Typo3RequestAwareTestTrait
             'arguments' => var_export($arguments, true),
             'documentRoot' => $this->instancePath,
             'originalRoot' => ORIGINAL_ROOT,
-            'vendorPath' => (new Testbase())->getPackagesPath(),
+            'vendorPath' => new Testbase()->getPackagesPath(),
         ]);
 
         $php = AbstractPhpProcess::factory();
@@ -181,7 +180,7 @@ trait Typo3RequestAwareTestTrait
                     $data['exception']['message'],
                     $data['exception']['code']
                 );
-            } catch (\Throwable $throwable) {
+            } catch (\Throwable) {
                 $exception = new InternalResponseException(
                     (string)$data['exception']['message'],
                     (int)$data['exception']['code'],

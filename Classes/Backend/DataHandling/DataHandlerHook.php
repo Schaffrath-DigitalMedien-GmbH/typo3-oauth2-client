@@ -11,16 +11,12 @@ use Waldhacker\Oauth2Client\Service\Oauth2ProviderManager;
 class DataHandlerHook implements DataHandlerCheckModifyAccessListHookInterface
 {
     public const INVALID_TOKEN = '_invalid_';
-    private const OAUTH2_FE_TABLE = 'tx_oauth2_feuser_provider_configuration';
-    private const OAUTH2_BE_TABLE = 'tx_oauth2_beuser_provider_configuration';
-    private const OAUTH2_CLIENT_CONFIG_FIELD = 'tx_oauth2_client_configs';
-    private const FE_USERS_TABLE = 'fe_users';
-    private Oauth2ProviderManager $oauth2ProviderManager;
+    private const string OAUTH2_FE_TABLE = 'tx_oauth2_feuser_provider_configuration';
+    private const string OAUTH2_BE_TABLE = 'tx_oauth2_beuser_provider_configuration';
+    private const string OAUTH2_CLIENT_CONFIG_FIELD = 'tx_oauth2_client_configs';
+    private const string FE_USERS_TABLE = 'fe_users';
 
-    public function __construct(Oauth2ProviderManager $oauth2ProviderManager)
-    {
-        $this->oauth2ProviderManager = $oauth2ProviderManager;
-    }
+    public function __construct(private readonly Oauth2ProviderManager $oauth2ProviderManager) {}
 
     /**
      * Restrict data handler operations on tx_oauth2_beuser_provider_configuration
@@ -37,7 +33,7 @@ class DataHandlerHook implements DataHandlerCheckModifyAccessListHookInterface
         $id,
         DataHandler $_
     ): void {
-        $isNew = is_string($id) && !empty($id) && strncasecmp($id, 'NEW', 3) === 0;
+        $isNew = is_string($id) && ($id !== '' && $id !== '0') && strncasecmp($id, 'NEW', 3) === 0;
 
         // Invalidate every attempt to create or modify frontend OAuth2 client configs via data handler.
         if ($table === self::FE_USERS_TABLE) {

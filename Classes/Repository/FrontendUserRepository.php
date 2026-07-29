@@ -4,23 +4,20 @@ declare(strict_types=1);
 
 namespace Waldhacker\Oauth2Client\Repository;
 
-use DateTime;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\ParameterType;
-use InvalidArgumentException;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use Waldhacker\Oauth2Client\Backend\DataHandling\DataHandlerHook;
 use Waldhacker\Oauth2Client\Database\Query\Restriction\Oauth2FeUserProviderConfigurationRestriction;
 
 class FrontendUserRepository
 {
-    private const OAUTH2_FE_CONFIG_TABLE = 'tx_oauth2_feuser_provider_configuration';
+    private const string OAUTH2_FE_CONFIG_TABLE = 'tx_oauth2_feuser_provider_configuration';
 
     public function __construct(
         private readonly ConnectionPool $connectionPool
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Exception
@@ -54,7 +51,7 @@ class FrontendUserRepository
 
         // @todo: log warning if more than one user matches
         // Do not login if more than one user matches!
-        return empty($result) || empty($result[0]) || count($result) > 1 ? null : $result[0];
+        return $result === [] || empty($result[0]) || count($result) > 1 ? null : $result[0];
     }
 
     /**
@@ -62,23 +59,23 @@ class FrontendUserRepository
      */
     public function persistIdentityForUser(string $provider, string $identifier, int $userid): void
     {
-        if (empty($provider)) {
-            throw new InvalidArgumentException('"provider" must not be empty', 1642867960);
+        if ($provider === '' || $provider === '0') {
+            throw new \InvalidArgumentException('"provider" must not be empty', 1642867960);
         }
-        if (empty($identifier)) {
-            throw new InvalidArgumentException('"identifier" must not be empty', 1642867961);
+        if ($identifier === '' || $identifier === '0') {
+            throw new \InvalidArgumentException('"identifier" must not be empty', 1642867961);
         }
 
-        $now = new DateTime();
+        $now = new \DateTime();
         $userWithEditRightsColumn = $GLOBALS['TCA'][
             self::OAUTH2_FE_CONFIG_TABLE
         ]['ctrl']['enablecolumns']['fe_user'] ?? 'parentid';
 
         $activeConfigurationUids = array_map(
-            'intval',
+            intval(...),
             array_column($this->getConfigurationsByIdentity($provider, $identifier, $userid), 'uid')
         );
-        if (!empty($activeConfigurationUids)) {
+        if ($activeConfigurationUids !== []) {
             $qb = $this->connectionPool->getQueryBuilderForTable(self::OAUTH2_FE_CONFIG_TABLE);
             $qb->delete(self::OAUTH2_FE_CONFIG_TABLE)
                 ->where(
@@ -153,7 +150,7 @@ class FrontendUserRepository
     public function deactivateProviderByUid(int $providerUid, int $userid): void
     {
         $activeProviders = $this->getActiveProviders($userid);
-        if (!in_array($providerUid, array_map('intval', array_column($activeProviders, 'uid')), true)) {
+        if (!in_array($providerUid, array_map(intval(...), array_column($activeProviders, 'uid')), true)) {
             return;
         }
 

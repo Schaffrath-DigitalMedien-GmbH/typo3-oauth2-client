@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Waldhacker\Oauth2Client\Authentication;
 
 use Doctrine\DBAL\Exception;
-use InvalidArgumentException;
+use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
+use League\OAuth2\Client\Token\AccessToken;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -36,8 +37,7 @@ class BackendAuthenticationService extends AbstractAuthenticationService
         private readonly UriBuilder $uriBuilder,
         private readonly ResponseFactoryInterface $responseFactory,
         private readonly EventDispatcherInterface $eventDispatcher,
-    ) {
-    }
+    ) {}
 
     /**
      * @return ?array
@@ -66,9 +66,9 @@ class BackendAuthenticationService extends AbstractAuthenticationService
         $providerIdFromPost = (string)($postParameters['oauth2-provider'] ?? '');
         $providerIdFromGet = (string)($getParameters['oauth2-provider'] ?? '');
 
-        $this->action = !empty($providerIdFromPost) && empty($code) && empty($state)
+        $this->action = $providerIdFromPost !== '' && $providerIdFromPost !== '0' && ($code === '' || $code === '0') && ($state === '' || $state === '0')
             ? 'authorize'
-            : (!empty($providerIdFromGet) && !empty($code) && !empty($state) ? 'verify' : 'invalid');
+            : ($providerIdFromGet !== '' && $providerIdFromGet !== '0' && ($code !== '' && $code !== '0') && ($state !== '' && $state !== '0') ? 'verify' : 'invalid');
 
         if ($this->action === 'authorize') {
             $this->authorize($providerIdFromPost, $request);
@@ -96,8 +96,8 @@ class BackendAuthenticationService extends AbstractAuthenticationService
 
     public function processLoginData(array &$loginData): bool
     {
-        $loginData['uname'] = $loginData['uname'] ?? '';
-        $loginData['uident'] = $loginData['uident'] ?? '';
+        $loginData['uname'] ??= '';
+        $loginData['uident'] ??= '';
 
         return true;
     }
@@ -110,7 +110,7 @@ class BackendAuthenticationService extends AbstractAuthenticationService
     private function authorize(string $providerId, ServerRequestInterface $request): void
     {
         // no oauth2 login at all or invalid provider
-        if (empty($providerId) || !$this->oauth2ProviderManager->hasBackendProvider($providerId)) {
+        if ($providerId === '' || $providerId === '0' || !$this->oauth2ProviderManager->hasBackendProvider($providerId)) {
             $this->sessionManager->removeSessionData($request);
             return;
         }
@@ -134,9 +134,9 @@ class BackendAuthenticationService extends AbstractAuthenticationService
     private function verify(string $providerId, string $code, string $state, ServerRequestInterface $request): ?array
     {
         if (
-            empty($providerId)
-            || empty($code)
-            || empty($state)
+            $providerId === '' || $providerId === '0'
+            || ($code === '' || $code === '0')
+            || ($state === '' || $state === '0')
             || !$this->oauth2ProviderManager->hasBackendProvider($providerId)
         ) {
             $this->sessionManager->removeSessionData($request);
@@ -149,19 +149,19 @@ class BackendAuthenticationService extends AbstractAuthenticationService
             $this->buildCallbackUri($providerId),
             $request
         );
-        if ($provider === null) {
+        if (!$provider instanceof AbstractProvider) {
             return null;
         }
         $accessToken = $this->oauth2Service->buildGetResourceOwnerAccessToken(
             $provider,
             $code
         );
-        if ($accessToken === null) {
+        if (!$accessToken instanceof AccessToken) {
             return null;
         }
         $this->remoteUser = $this->oauth2Service->getResourceOwner($provider, $accessToken);
 
-        if ($this->remoteUser === null) {
+        if (!$this->remoteUser instanceof ResourceOwnerInterface) {
             return null;
         }
 
@@ -203,7 +203,7 @@ class BackendAuthenticationService extends AbstractAuthenticationService
     {
         $request = $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
         if (!($request instanceof ServerRequestInterface)) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 sprintf('Request must implement "%s"', ServerRequestInterface::class),
                 1643446001
             );

@@ -22,7 +22,9 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
 class ExtendedInternalRequest extends InternalRequest
 {
+    #[\Override]
     protected $parsedBody = [];
+    #[\Override]
     protected $cookieParams = [];
 
     public function withHeaders(array $headers)
@@ -34,11 +36,13 @@ class ExtendedInternalRequest extends InternalRequest
         return $request;
     }
 
+    #[\Override]
     public function getParsedBody(): ?array
     {
         return $this->parsedBody;
     }
 
+    #[\Override]
     public function withParsedBody(?array $parsedBody = null): InternalRequest
     {
         $clonedObject = clone $this;
@@ -46,12 +50,14 @@ class ExtendedInternalRequest extends InternalRequest
         return $clonedObject;
     }
 
-    public function getCookieParams()
+    #[\Override]
+    public function getCookieParams(): array
     {
         return $this->cookieParams;
     }
 
-    public function withCookieParams(array $cookies)
+    #[\Override]
+    public function withCookieParams(array $cookies): static
     {
         $clonedObject = clone $this;
         $clonedObject->cookieParams = $cookies;

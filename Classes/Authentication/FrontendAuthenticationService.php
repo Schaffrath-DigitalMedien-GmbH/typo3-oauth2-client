@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Waldhacker\Oauth2Client\Authentication;
 
 use Doctrine\DBAL\Exception;
-use InvalidArgumentException;
+use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
+use League\OAuth2\Client\Token\AccessToken;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -15,6 +16,7 @@ use TYPO3\CMS\Core\Http\ImmediateResponseException;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Session\Backend\Exception\SessionNotCreatedException;
 use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use Waldhacker\Oauth2Client\Events\FrontendUserLookupEvent;
 use Waldhacker\Oauth2Client\Exception\MissingConfigurationException;
 use Waldhacker\Oauth2Client\Frontend\RequestStates;
@@ -38,8 +40,7 @@ class FrontendAuthenticationService extends AbstractAuthenticationService
         private readonly RequestStates $requestStates,
         private readonly ResponseFactoryInterface $responseFactory,
         private readonly EventDispatcherInterface $eventDispatcher,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array|null
@@ -91,8 +92,8 @@ class FrontendAuthenticationService extends AbstractAuthenticationService
 
     public function processLoginData(array &$loginData): bool
     {
-        $loginData['uname'] = $loginData['uname'] ?? '';
-        $loginData['uident'] = $loginData['uident'] ?? '';
+        $loginData['uname'] ??= '';
+        $loginData['uident'] ??= '';
 
         return true;
     }
@@ -104,7 +105,7 @@ class FrontendAuthenticationService extends AbstractAuthenticationService
     private function authorize(string $providerId, ServerRequestInterface $request): void
     {
         // no oauth2 login at all or invalid provider
-        if (empty($providerId) || !$this->oauth2ProviderManager->hasFrontendProvider($providerId)) {
+        if ($providerId === '' || $providerId === '0' || !$this->oauth2ProviderManager->hasFrontendProvider($providerId)) {
             $this->sessionManager->removeSessionData($request);
             return;
         }
@@ -128,9 +129,9 @@ class FrontendAuthenticationService extends AbstractAuthenticationService
     private function verify(string $providerId, string $code, string $state, ServerRequestInterface $request): ?array
     {
         if (
-            empty($providerId)
-            || empty($code)
-            || empty($state)
+            $providerId === '' || $providerId === '0'
+            || ($code === '' || $code === '0')
+            || ($state === '' || $state === '0')
             || !$this->oauth2ProviderManager->hasFrontendProvider($providerId)
         ) {
             return null;
@@ -142,26 +143,26 @@ class FrontendAuthenticationService extends AbstractAuthenticationService
             $this->buildCallbackUri($providerId, $request),
             $request
         );
-        if ($provider === null) {
+        if (!$provider instanceof AbstractProvider) {
             return null;
         }
         $accessToken = $this->oauth2Service->buildGetResourceOwnerAccessToken(
             $provider,
             $code
         );
-        if ($accessToken === null) {
+        if (!$accessToken instanceof AccessToken) {
             return null;
         }
         $this->remoteUser = $this->oauth2Service->getResourceOwner($provider, $accessToken);
 
-        if ($this->remoteUser === null) {
+        if (!$this->remoteUser instanceof ResourceOwnerInterface) {
             return null;
         }
 
         /** @var Site|null $site */
         $site = $this->siteService->getSite();
         $language = $this->siteService->getLanguage();
-        if ($site === null || $language === null) {
+        if ($site === null || !$language instanceof SiteLanguage) {
             return null;
         }
         $siteConfiguration = $site->getConfiguration();
@@ -221,7 +222,7 @@ class FrontendAuthenticationService extends AbstractAuthenticationService
     {
         $request = $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
         if (!($request instanceof ServerRequestInterface)) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 sprintf('Request must implement "%s"', ServerRequestInterface::class),
                 1643446001
             );

@@ -581,7 +581,7 @@ class BackendLoginTest extends FunctionalTestCase
 
         yield 'deleted user' => [
             'userUid' => 8,
-            'deleteUser' => true
+            'deleteUser' => true,
         ];
     }
 
@@ -669,7 +669,7 @@ class BackendLoginTest extends FunctionalTestCase
         $uri = $siteBaseUri . '/typo3/login?loginProvider=1616569532';
 
         $responseData = $this->fetchBackendPageContens($this->buildGetRequest($uri));
-        $loginFormData = (new DataPusher(new DataExtractor($responseData['pageMarkup'])))
+        $loginFormData = new DataPusher(new DataExtractor($responseData['pageMarkup']))
             ->with('oauth2-provider', $providerId);
         return $this->fetchBackendPageContens($loginFormData->toPostRequest($this->buildGetRequest()), false);
     }

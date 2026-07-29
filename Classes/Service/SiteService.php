@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Waldhacker\Oauth2Client\Service;
 
-use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Http\ServerRequestFactory;
 use TYPO3\CMS\Core\Http\Uri;
@@ -71,7 +70,7 @@ class SiteService
         /** @var Site|null $site */
         $site = $this->getSite($request);
         $language = $this->getLanguage($request);
-        if (!$site instanceof Site || $language === null) {
+        if (!$site instanceof Site || !$language instanceof SiteLanguage) {
             return self::CALLBACK_SLUG;
         }
 
@@ -82,14 +81,14 @@ class SiteService
                               : ($languageConfiguration['oauth2_callback_slug']);
         $callbackSlug = trim($callbackSlug, '/');
 
-        return empty($callbackSlug) ? self::CALLBACK_SLUG : $callbackSlug;
+        return $callbackSlug === '' || $callbackSlug === '0' ? self::CALLBACK_SLUG : $callbackSlug;
     }
 
     private function getRequest(?ServerRequestInterface $request = null): ServerRequestInterface
     {
-        $request = $request ?? $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
+        $request ??= $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
         if (!($request instanceof ServerRequestInterface)) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 sprintf('Request must implement "%s"', ServerRequestInterface::class),
                 1643446000
             );

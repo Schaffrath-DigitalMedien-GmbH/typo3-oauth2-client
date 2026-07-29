@@ -17,9 +17,8 @@ final class BackendUserLookupEvent
         private readonly AccessTokenInterface $accessToken,
         private readonly ResourceOwnerInterface $remoteUser,
         private ?array $typo3User,
-        private ServerRequestInterface $request
-    ) {
-    }
+        private readonly ServerRequestInterface $request
+    ) {}
 
     public function getProviderId(): string
     {

@@ -9,6 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Backend\Template\Components\ComponentFactory;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Context\Context;
@@ -28,8 +29,8 @@ readonly class ManageProvidersController
         private IconFactory $iconFactory,
         private ModuleTemplateFactory $moduleTemplateFactory,
         private Context $context,
-    ) {
-    }
+        private ComponentFactory $componentFactory,
+    ) {}
 
     /**
      * @throws AspectNotFoundException
@@ -43,7 +44,7 @@ readonly class ManageProvidersController
         $userid = (int)$this->context->getPropertyFromAspect('backend.user', 'id');
         $moduleTemplate->assignMultiple([
             'providers' => $this->oauth2ProviderManager->getConfiguredBackendProviders(),
-            'activeProviders' => $this->backendUserRepository->getActiveProviders($userid)
+            'activeProviders' => $this->backendUserRepository->getActiveProviders($userid),
         ]);
         return $moduleTemplate->renderResponse('Backend/ManageProviders');
     }
@@ -53,14 +54,14 @@ readonly class ManageProvidersController
      */
     private function addButtons(ServerRequestInterface $request, ModuleTemplate $moduleTemplate): void
     {
-        $languageFile = 'LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:';
+
         $buttonBar = $moduleTemplate->getDocHeaderComponent()->getButtonBar();
 
-        $button = $buttonBar
-            ->makeLinkButton()
+        $button = $this->componentFactory
+            ->createLinkButton()
             ->setHref((string)$this->uriBuilder->buildUriFromRoute('user_setup'))
             ->setIcon($this->iconFactory->getIcon('actions-view-go-back', IconSize::SMALL))
-            ->setTitle($this->getLanguageService()->sL($languageFile . 'labels.goBack'))
+            ->setTitle($this->getLanguageService()->sL('core.core:labels.goBack'))
             ->setShowLabelText(true);
         $buttonBar->addButton($button);
     }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Waldhacker\Oauth2Client\Service;
 
-use Exception;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessToken;
@@ -16,14 +15,14 @@ use Waldhacker\Oauth2Client\Session\SessionManager;
 
 class Oauth2Service
 {
-    private LoggerInterface $logger;
+    private readonly LoggerInterface $logger;
 
     public function __construct(
         private readonly Oauth2ProviderManager $oauth2ProviderManager,
         private readonly SessionManager $sessionManager,
         private readonly LogManager $logManager,
     ) {
-        $this->logger = $this->logManager->getLogger(__CLASS__);
+        $this->logger = $this->logManager->getLogger(self::class);
     }
 
     /**
@@ -76,7 +75,7 @@ class Oauth2Service
             if ($accessToken instanceof AccessToken) {
                 return $accessToken;
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->warning($e->getMessage());
         }
         return null;
@@ -87,7 +86,7 @@ class Oauth2Service
         $user = null;
         try {
             $user = $provider->getResourceOwner($accessToken);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->warning($e->getMessage());
         }
         return $user;

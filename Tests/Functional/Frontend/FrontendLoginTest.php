@@ -1187,7 +1187,7 @@ class FrontendLoginTest extends FunctionalTestCase
 
         yield 'deleted user' => [
             'userUid' => 1006,
-            'deleteUser' => true
+            'deleteUser' => true,
         ];
 
         yield 'user within another storage' => [

@@ -22,12 +22,7 @@ use GuzzleHttp\Psr7\Response;
 
 class InvalidAccessTokenResponseFromGitLabHttpMock
 {
-    private array $options;
-
-    public function __construct(array $options)
-    {
-        $this->options = $options;
-    }
+    public function __construct(private readonly array $options) {}
 
     /**
      * Mock for Waldhacker\Oauth2Client\Service\Oauth2Service::getUser() calls

@@ -13,6 +13,7 @@ use TYPO3\CMS\Core\Context\Exception\AspectPropertyNotFoundException;
 use TYPO3\CMS\Core\Context\UserAspect;
 use TYPO3\CMS\Core\Session\Backend\Exception\SessionNotCreatedException;
 use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 use Waldhacker\Oauth2Client\Frontend\RedirectRequestService;
@@ -30,8 +31,7 @@ class ManageProvidersController extends ActionController
         private readonly SessionManager $sessionManager,
         private readonly RedirectRequestService $redirectRequestService,
         private readonly Context $context
-    ) {
-    }
+    ) {}
 
     /**
      * @throws AspectNotFoundException
@@ -53,7 +53,7 @@ class ManageProvidersController extends ActionController
             $userid = (int)$frontendUser->get('id');
             $this->view->assignMultiple([
                 'providers' => $this->oauth2ProviderManager->getEnabledFrontendProviders(),
-                'activeProviders' => $this->frontendUserRepository->getActiveProviders($userid)
+                'activeProviders' => $this->frontendUserRepository->getActiveProviders($userid),
             ]);
         }
 
@@ -108,7 +108,7 @@ class ManageProvidersController extends ActionController
         /** @var Site|null $site */
         $site = $this->siteService->getSite();
         $language = $this->siteService->getLanguage();
-        if ($site === null || $language === null) {
+        if ($site === null || !$language instanceof SiteLanguage) {
             return false;
         }
 

@@ -22,12 +22,7 @@ use GuzzleHttp\Psr7\Response;
 
 class SuccessfulGetUserFromGitLabHttpMock
 {
-    private array $options;
-
-    public function __construct(array $options)
-    {
-        $this->options = $options;
-    }
+    public function __construct(private array $options) {}
 
     /**
      * Mock for Waldhacker\Oauth2Client\Service\Oauth2Service::getUser() calls
@@ -42,7 +37,7 @@ class SuccessfulGetUserFromGitLabHttpMock
                 'refresh_token' => '999999999999999999999999999999999999999999999ffffffffffffffffff',
                 'scope' => 'openid read_user',
                 'created_at' => 1642662080,
-                'id_token' => ''
+                'id_token' => '',
             ])),
 
             // Response from $provider->getResourceOwner($accessToken) (https://gitlab.site/api/v4/user)
@@ -51,7 +46,7 @@ class SuccessfulGetUserFromGitLabHttpMock
                 'username' => $this->options['remoteUser']['username'] ?? 'userX',
                 'name' => $this->options['remoteUser']['name'] ?? 'User X',
                 'email' => $this->options['remoteUser']['email'] ?? 'userx@waldhacker.dev',
-            ]))
+            ])),
         ];
     }
 }

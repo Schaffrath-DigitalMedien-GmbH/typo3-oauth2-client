@@ -20,7 +20,6 @@ namespace Waldhacker\Oauth2Client\Tests\Functional\Framework;
 
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Database\Connection;
-use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\DataHandling\Scenario\DataHandlerFactory;
 use TYPO3\TestingFramework\Core\Functional\Framework\DataHandling\Scenario\DataHandlerWriter;
 use Waldhacker\Oauth2Client\Backend\DataHandling\DataHandlerHook;
@@ -58,10 +57,12 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
     protected const SITE2_HOST = 'site2';
     protected const SITE2_BASE_URI = 'http://' . self::SITE2_HOST;
 
+    #[\Override]
     protected $pathsToLinkInTestInstance = [
         'typo3conf/ext/oauth2_client/Tests/Functional/Fixtures/Frontend/AdditionalConfiguration.php' => 'typo3conf/AdditionalConfiguration.php',
     ];
 
+    #[\Override]
     protected $coreExtensionsToLoad = [
         'core',
         'backend',
@@ -74,6 +75,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         'setup',
     ];
 
+    #[\Override]
     protected $testExtensionsToLoad = [
         'typo3conf/ext/oauth2_client',
         'typo3conf/ext/oauth2_client_test',
@@ -121,10 +123,10 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
                         'oauth2_callback_slug' => '',
                         'oauth2_storage_pid' => 1000,
                     ]
-                )
+                ),
             ],
             [
-                $this->buildErrorHandlingConfiguration('Fluid', [404])
+                $this->buildErrorHandlingConfiguration('Fluid', [404]),
             ]
         );
 
@@ -147,14 +149,14 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
                         'oauth2_callback_slug' => '',
                         'oauth2_storage_pid' => 1000,
                     ]
-                )
+                ),
             ],
             [
-                $this->buildErrorHandlingConfiguration('Fluid', [404])
+                $this->buildErrorHandlingConfiguration('Fluid', [404]),
             ]
         );
 
-        $this->withDatabaseSnapshot(function () {
+        $this->withDatabaseSnapshot(function (): void {
             $this->setUpDatabase();
         });
     }
@@ -196,72 +198,72 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
     {
         $qb = $this->getConnectionPool()->getQueryBuilderForTable('tx_oauth2_beuser_provider_configuration');
         $qb->getRestrictions()->removeByType(Oauth2BeUserProviderConfigurationRestriction::class);
-        return $qb->select('*')->from('tx_oauth2_beuser_provider_configuration')->execute()->fetchAllAssociative();
+        return $qb->select('*')->from('tx_oauth2_beuser_provider_configuration')->executeQuery()->fetchAllAssociative();
     }
 
     protected function getFrontendUserOauth2ProviderConfigurations(): array
     {
         $qb = $this->getConnectionPool()->getQueryBuilderForTable('tx_oauth2_feuser_provider_configuration');
         $qb->getRestrictions()->removeByType(Oauth2FeUserProviderConfigurationRestriction::class);
-        return $qb->select('*')->from('tx_oauth2_feuser_provider_configuration')->execute()->fetchAllAssociative();
+        return $qb->select('*')->from('tx_oauth2_feuser_provider_configuration')->executeQuery()->fetchAllAssociative();
     }
 
     protected function getBackendSessionData(): array
     {
         $qb = $this->getConnectionPool()->getQueryBuilderForTable('be_sessions');
-        $rows = $qb->select('*')->from('be_sessions')->execute()->fetchAllAssociative();
+        $rows = $qb->select('*')->from('be_sessions')->executeQuery()->fetchAllAssociative();
         return $this->unserializeSessionDataFromSessions($rows);
     }
 
     protected function getFrontendSessionData(): array
     {
         $qb = $this->getConnectionPool()->getQueryBuilderForTable('fe_sessions');
-        $rows = $qb->select('*')->from('fe_sessions')->execute()->fetchAllAssociative();
+        $rows = $qb->select('*')->from('fe_sessions')->executeQuery()->fetchAllAssociative();
         return $this->unserializeSessionDataFromSessions($rows);
     }
 
     protected function getBackendSessionDataByUser(int $userId): array
     {
-        return array_values(array_filter($this->getBackendSessionData(), fn (array $session): bool => (int)$session['ses_userid'] === $userId));
+        return array_values(array_filter($this->getBackendSessionData(), fn(array $session): bool => (int)$session['ses_userid'] === $userId));
     }
 
     protected function getFrontendSessionDataByUser(int $userId): array
     {
-        return array_values(array_filter($this->getFrontendSessionData(), fn (array $session): bool => (int)$session['ses_userid'] === $userId));
+        return array_values(array_filter($this->getFrontendSessionData(), fn(array $session): bool => (int)$session['ses_userid'] === $userId));
     }
 
     protected function getOauth2BackendSessionData(): array
     {
-        return array_values(array_filter($this->getBackendSessionData(), fn (array $session): bool => strpos($session['ses_data_original'], 'oauth2') !== false));
+        return array_values(array_filter($this->getBackendSessionData(), fn(array $session): bool => str_contains($session['ses_data_original'], 'oauth2')));
     }
 
     protected function getOauth2FrontendSessionData(): array
     {
-        return array_values(array_filter($this->getFrontendSessionData(), fn (array $session): bool => strpos($session['ses_data_original'], 'oauth2') !== false));
+        return array_values(array_filter($this->getFrontendSessionData(), fn(array $session): bool => str_contains($session['ses_data_original'], 'oauth2')));
     }
 
     protected function removeOauth2BackendSessionData(): void
     {
         $qb = $this->getConnectionPool()->getQueryBuilderForTable('be_sessions');
-        $qb->delete('be_sessions')->where($qb->expr()->in('ses_id', $qb->createNamedParameter(array_column($this->getOauth2BackendSessionData(), 'ses_id'), Connection::PARAM_STR_ARRAY)))->execute();
+        $qb->delete('be_sessions')->where($qb->expr()->in('ses_id', $qb->createNamedParameter(array_column($this->getOauth2BackendSessionData(), 'ses_id'), Connection::PARAM_STR_ARRAY)))->executeStatement();
     }
 
     protected function removeOauth2FrontendSessionData(): void
     {
         $qb = $this->getConnectionPool()->getQueryBuilderForTable('fe_sessions');
-        $qb->delete('fe_sessions')->where($qb->expr()->in('ses_id', $qb->createNamedParameter(array_column($this->getOauth2FrontendSessionData(), 'ses_id'), Connection::PARAM_STR_ARRAY)))->execute();
+        $qb->delete('fe_sessions')->where($qb->expr()->in('ses_id', $qb->createNamedParameter(array_column($this->getOauth2FrontendSessionData(), 'ses_id'), Connection::PARAM_STR_ARRAY)))->executeStatement();
     }
 
     protected function deleteFrontendUser(int $userId): void
     {
         $qb = $this->getConnectionPool()->getQueryBuilderForTable('fe_users');
-        $qb->update('fe_users')->set('deleted', 1)->where($qb->expr()->eq('uid', $qb->createNamedParameter($userId, \PDO::PARAM_INT)))->execute();
+        $qb->update('fe_users')->set('deleted', 1)->where($qb->expr()->eq('uid', $qb->createNamedParameter($userId, Connection::PARAM_INT)))->executeStatement();
     }
 
     protected function deleteBackendUser(int $userId): void
     {
         $qb = $this->getConnectionPool()->getQueryBuilderForTable('be_users');
-        $qb->update('be_users')->set('deleted', 1)->where($qb->expr()->eq('uid', $qb->createNamedParameter($userId, \PDO::PARAM_INT)))->execute();
+        $qb->update('be_users')->set('deleted', 1)->where($qb->expr()->eq('uid', $qb->createNamedParameter($userId, Connection::PARAM_INT)))->executeStatement();
     }
 
     protected function createBackendUserOauth2ProviderConfiguration(int $uid, int $userId, string $providerId, string $remoteIdentifier): void
@@ -275,9 +277,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
             ->setValue('tstamp', $now->format('U'))
             ->setValue('cruser_id', $userId)
             ->setValue('parentid', $userId)
-            ->setValue('provider', $providerId)
-            ->setValue('identifier', $remoteIdentifier)
-            ->execute();
+            ->setValue('provider', $providerId)->setValue('identifier', $remoteIdentifier)->executeStatement();
     }
 
     protected function createFrontendUserOauth2ProviderConfiguration(int $uid, int $userId, string $providerId, string $remoteIdentifier): void
@@ -291,9 +291,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
             ->setValue('tstamp', $now->format('U'))
             ->setValue('cruser_id', $userId)
             ->setValue('parentid', $userId)
-            ->setValue('provider', $providerId)
-            ->setValue('identifier', $remoteIdentifier)
-            ->execute();
+            ->setValue('provider', $providerId)->setValue('identifier', $remoteIdentifier)->executeStatement();
     }
 
     protected function resetSessionData(): void
@@ -312,7 +310,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
     {
         $uri = $siteBaseUri . $languageSlug . '/login';
         $responseData = $this->fetchFrontendPageContens($this->buildGetRequest($uri));
-        $loginFormData = (new DataPusher(new DataExtractor($responseData['pageMarkup'])))
+        $loginFormData = new DataPusher(new DataExtractor($responseData['pageMarkup']))
             ->with('user', $username)
             ->with('pass', $password)
             ->without('oauth2-provider');
@@ -330,7 +328,7 @@ abstract class FunctionalTestCase extends \TYPO3\TestingFramework\Core\Functiona
         $uri = $siteBaseUri . '/typo3/login?loginProvider=1433416747';
 
         $responseData = $this->fetchBackendPageContens($this->buildGetRequest($uri));
-        $loginFormData = (new DataPusher(new DataExtractor($responseData['pageMarkup'])))
+        $loginFormData = new DataPusher(new DataExtractor($responseData['pageMarkup']))
             ->with('username', $username)
             ->with('userident', $password);
 

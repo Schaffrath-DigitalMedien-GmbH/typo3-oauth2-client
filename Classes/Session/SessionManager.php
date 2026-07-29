@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Waldhacker\Oauth2Client\Session;
 
-use DateTimeImmutable;
-use DateTimeInterface;
-use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -28,16 +25,16 @@ class SessionManager
 
     public const SESSION_NAME_STATE = 'oauth2-state';
     public const SESSION_NAME_ORIGINAL_REQUEST = 'oauth2-original-registration-request-data';
-    private const REQUEST_TYPE_FE = 'FE';
-    private const REQUEST_TYPE_BE = 'BE';
+    private const string REQUEST_TYPE_FE = 'FE';
+    private const string REQUEST_TYPE_BE = 'BE';
 
     private array $userSessionManagers = [
         self::REQUEST_TYPE_FE => null,
-        self::REQUEST_TYPE_BE => null
+        self::REQUEST_TYPE_BE => null,
     ];
     private array $userSessions = [
         self::REQUEST_TYPE_FE => null,
-        self::REQUEST_TYPE_BE => null
+        self::REQUEST_TYPE_BE => null,
     ];
 
     public function getSessionData(string $key, ?ServerRequestInterface $request = null): mixed
@@ -164,7 +161,7 @@ class SessionManager
         $sessionId = self::encodeHashSignedJwt(
             [
                 'identifier' => $sessionId,
-                'time' => (new DateTimeImmutable())->format(DateTimeInterface::RFC3339),
+                'time' => new \DateTimeImmutable()->format(\DateTimeInterface::RFC3339),
             ],
             self::createSigningKeyFromEncryptionKey(UserSession::class)
         );
@@ -188,7 +185,7 @@ class SessionManager
             ? (string)$GLOBALS['TYPO3_CONF_VARS']['SYS']['cookieDomain']
             : (string)$GLOBALS['TYPO3_CONF_VARS'][$requestType]['cookieDomain'];
 
-        if (empty($cookieDomain) || $cookieDomain[0] !== '/') {
+        if ($cookieDomain === '' || $cookieDomain === '0' || $cookieDomain[0] !== '/') {
             return $cookieDomain;
         }
 
@@ -203,7 +200,7 @@ class SessionManager
         $frontendRequestType = $this->isFrontendRequest($request) ? self::REQUEST_TYPE_FE : null;
         $requestType = $this->isBackendRequest($request) ? self::REQUEST_TYPE_BE : $frontendRequestType;
         if (!in_array($requestType, [self::REQUEST_TYPE_FE, self::REQUEST_TYPE_BE], true)) {
-            throw new InvalidArgumentException('Invalid request type', 1642868012);
+            throw new \InvalidArgumentException('Invalid request type', 1642868012);
         }
         return $requestType;
     }
@@ -220,9 +217,9 @@ class SessionManager
 
     private function getRequest(?ServerRequestInterface $request = null): ServerRequestInterface
     {
-        $request = $request ?? $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
+        $request ??= $GLOBALS['TYPO3_REQUEST'] ?? ServerRequestFactory::fromGlobals();
         if (!($request instanceof ServerRequestInterface)) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 sprintf('Request must implement "%s"', ServerRequestInterface::class),
                 1643445716
             );

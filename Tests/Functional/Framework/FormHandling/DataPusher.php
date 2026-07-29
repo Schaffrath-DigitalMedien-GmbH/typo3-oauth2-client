@@ -20,17 +20,16 @@ namespace Waldhacker\Oauth2Client\Tests\Functional\Framework\FormHandling;
 
 use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
-use TYPO3\CMS\Core\Utility\StringUtility;
 use Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling\ExtendedInternalRequest;
 
 class DataPusher
 {
-    private $formData = [];
-    private $with = [];
-    private $withNoPrefix = [];
-    private $without = [];
-    private $withoutNoPrefix = [];
-    private $withChash = true;
+    private array $formData;
+    private array $with = [];
+    private array $withNoPrefix = [];
+    private array $without = [];
+    private array $withoutNoPrefix = [];
+    private bool $withChash = true;
 
     public function __construct(DataExtractor $dataExtractor, string $query = '//form')
     {
@@ -109,9 +108,9 @@ class DataPusher
             parse_str(sprintf('%s=%s', $elementData['name'], $elementData['value'] ?? ''), $nameStruct);
             $postStructure = array_replace_recursive($postStructure, $nameStruct);
 
-            if (StringUtility::endsWith($elementData['name'], '[__state]')) {
+            if (str_ends_with($elementData['name'], '[__state]')) {
                 $prefix = key(ArrayUtility::flatten($nameStruct));
-                $prefixItems = explode('.', $prefix);
+                $prefixItems = explode('.', (string)$prefix);
                 array_pop($prefixItems);
                 $dataPrefix = implode('.', $prefixItems) . '.';
             }

@@ -40,8 +40,7 @@ class AuthorizeController implements LoggerAwareInterface
         private readonly ResponseFactoryInterface $responseFactory,
         private readonly Context $context,
         private readonly ViewFactoryInterface $viewFactory,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws SessionNotCreatedException
@@ -58,7 +57,7 @@ class AuthorizeController implements LoggerAwareInterface
 
         if (
             !$backendUser->isLoggedIn()
-            || empty($providerId)
+            || ($providerId === '' || $providerId === '0')
             || !$this->oauth2ProviderManager->hasBackendProvider($providerId)
             || !in_array($action, self::$allowedActions, true)
         ) {

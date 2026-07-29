@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling\Backend;
 
-use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestContext;
 use Waldhacker\Oauth2Client\Tests\Functional\Framework\RequestHandling\AbstractRequestBootstrap;
@@ -31,11 +30,11 @@ class RequestBootstrap extends AbstractRequestBootstrap
 
     protected function setGlobalVariables(): void
     {
-        if (empty($this->requestArguments)) {
+        if ($this->requestArguments === []) {
             die('No JSON encoded arguments given');
         }
 
-        if (empty($this->documentRoot)) {
+        if ($this->documentRoot === '' || $this->documentRoot === '0') {
             die('No documentRoot given');
         }
 
@@ -69,11 +68,11 @@ class RequestBootstrap extends AbstractRequestBootstrap
         ];
         $_SERVER['DOCUMENT_ROOT'] = $this->documentRoot;
         $_SERVER['HTTP_USER_AGENT'] = 'TYPO3 Functional Test Request';
-        $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'] = isset($requestUrlParts['host']) ? $requestUrlParts['host'] : 'localhost';
+        $_SERVER['HTTP_HOST'] = $_SERVER['SERVER_NAME'] = $requestUrlParts['host'] ?? 'localhost';
         $_SERVER['SERVER_ADDR'] = $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
         $_SERVER['SCRIPT_NAME'] = $_SERVER['PHP_SELF'] = $_SERVER['DOCUMENT_URI'] = '/typo3/index.php';
         $_SERVER['SCRIPT_FILENAME'] = $_SERVER['_'] = $_SERVER['PATH_TRANSLATED'] = $this->documentRoot . '/typo3/index.php';
-        $_SERVER['QUERY_STRING'] = (isset($requestUrlParts['query']) ? $requestUrlParts['query'] : '');
+        $_SERVER['QUERY_STRING'] = ($requestUrlParts['query'] ?? '');
         $_SERVER['REQUEST_URI'] = $requestUrlParts['path'] . (isset($requestUrlParts['query']) ? '?' . $requestUrlParts['query'] : '');
         $_SERVER['REQUEST_METHOD'] = $this->request->getMethod();
 

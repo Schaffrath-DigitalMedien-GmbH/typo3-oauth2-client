@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Waldhacker\Oauth2Client\Controller\Backend\ManageProvidersController;
 use Waldhacker\Oauth2Client\Controller\Backend\Registration\AuthorizeController;
 use Waldhacker\Oauth2Client\Controller\Backend\Registration\VerifyController;
@@ -14,8 +16,8 @@ return [
                 'oauth2-provider' => true,
                 'action' => true,
                 'code' => true,
-                'state' => true
-            ]
+                'state' => true,
+            ],
         ],
         'target' => AuthorizeController::class . '::handleRequest',
     ],
@@ -26,5 +28,5 @@ return [
     'oauth2_manage_providers' => [
         'path' => '/oauth2/manage/providers',
         'target' => ManageProvidersController::class,
-    ]
+    ],
 ];

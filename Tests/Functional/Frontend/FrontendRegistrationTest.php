@@ -145,14 +145,14 @@ class FrontendRegistrationTest extends FunctionalTestCase
                 'oauth2-original-registration-request-data' => [
                     'protocolVersion' => '1.1',
                     'method' => 'GET',
-                    'uri'=> $siteBaseUri . $languageSlug . '/manage-providers',
+                    'uri' => $siteBaseUri . $languageSlug . '/manage-providers',
                     'headers' => [
                         'user-agent' => ['TYPO3 Functional Test Request'],
                         'host' => [$siteHost],
                     ],
-                    'parsedBody' => []
+                    'parsedBody' => [],
                 ],
-                'oauth2-state' => $requestedState
+                'oauth2-state' => $requestedState,
             ],
             $oauth2FrontendSessionData[0]['ses_data'],
             'assert: the frontend session contains the oauth2 state, which is also contained in the authorization request uri and the original request data'
@@ -518,14 +518,14 @@ class FrontendRegistrationTest extends FunctionalTestCase
                 'oauth2-original-registration-request-data' => [
                     'protocolVersion' => '1.1',
                     'method' => 'GET',
-                    'uri'=> $siteBaseUri . $languageSlug . '/manage-providers',
+                    'uri' => $siteBaseUri . $languageSlug . '/manage-providers',
                     'headers' => [
                         'user-agent' => ['TYPO3 Functional Test Request'],
                         'host' => [$siteHost],
                     ],
-                    'parsedBody' => []
+                    'parsedBody' => [],
                 ],
-                'oauth2-state' => $requestedState
+                'oauth2-state' => $requestedState,
             ],
             $oauth2FrontendSessionData[0]['ses_data'],
             'assert: the frontend session contains the oauth2 state, which is also contained in the authorization request uri and the original request data'
@@ -651,7 +651,7 @@ class FrontendRegistrationTest extends FunctionalTestCase
         self::assertEquals(0, (int)$oauth2FrontendSessionData[0]['ses_userid'], 'assert: the frontend session is not connected to a user');
         self::assertEquals(
             [
-                'oauth2-state' => $requestedState
+                'oauth2-state' => $requestedState,
             ],
             $oauth2FrontendSessionData[0]['ses_data'],
             'assert: the frontend session contains the oauth2 state, which is also contained in the authorization request uri'
@@ -854,14 +854,14 @@ class FrontendRegistrationTest extends FunctionalTestCase
                 'oauth2-original-registration-request-data' => [
                     'protocolVersion' => '1.1',
                     'method' => 'GET',
-                    'uri'=> $siteBaseUri . $languageSlug . '/manage-providers',
+                    'uri' => $siteBaseUri . $languageSlug . '/manage-providers',
                     'headers' => [
                         'user-agent' => ['TYPO3 Functional Test Request'],
                         'host' => [$siteHost],
                     ],
-                    'parsedBody' => []
+                    'parsedBody' => [],
                 ],
-                'oauth2-state' => $requestedState
+                'oauth2-state' => $requestedState,
             ],
             $oauth2FrontendSessionData[0]['ses_data'],
             'assert: the frontend session contains the oauth2 state, which is also contained in the authorization request uri and the original request data'
@@ -972,7 +972,7 @@ class FrontendRegistrationTest extends FunctionalTestCase
         self::assertEquals(0, (int)$oauth2FrontendSessionData[0]['ses_userid'], 'assert: the frontend session is not connected to a user');
         self::assertEquals(
             [
-                'oauth2-state' => $requestedState
+                'oauth2-state' => $requestedState,
             ],
             $oauth2FrontendSessionData[0]['ses_data'],
             'assert: the frontend session contains the oauth2 state'

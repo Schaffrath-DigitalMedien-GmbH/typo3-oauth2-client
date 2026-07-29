@@ -28,8 +28,7 @@ class ManageProvidersButtonRenderer
         private readonly Oauth2ProviderManager $oauth2ProviderManager,
         private readonly IconFactory $iconFactory,
         private readonly Context $context,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws AspectNotFoundException
@@ -39,22 +38,22 @@ class ManageProvidersButtonRenderer
     public function render(): string
     {
         $html = '';
-        $languageFile = 'LLL:EXT:oauth2_client/Resources/Private/Language/locallang_be.xlf:';
+
         $lang = $this->getLanguageService();
         $userid = (int)$this->context->getPropertyFromAspect('backend.user', 'id');
         $activeProviders = $this->backendUserRepository->getActiveProviders($userid);
         $hasActiveProviders = count($activeProviders) > 0;
         if ($hasActiveProviders) {
             $html .= ' <span class="badge badge-success">'
-                . htmlspecialchars($lang->sL($languageFile . 'oauth2Providers.enabled'), ENT_QUOTES | ENT_HTML5)
+                . htmlspecialchars($lang->sL('oauth2_client.be:oauth2Providers.enabled'), ENT_QUOTES | ENT_HTML5)
                 . '</span>';
         }
         $html .= '<p class="text-muted">'
-            . nl2br(htmlspecialchars($lang->sL($languageFile . 'oauth2Providers.description'), ENT_QUOTES | ENT_HTML5))
+            . nl2br(htmlspecialchars($lang->sL('oauth2_client.be:oauth2Providers.description'), ENT_QUOTES | ENT_HTML5))
             . '</p>';
         if ($this->oauth2ProviderManager->getConfiguredBackendProviders() === null) {
             $html .= '<span class="badge badge-danger">'
-                . htmlspecialchars($lang->sL($languageFile . 'oauth2Providers.notAvailable'), ENT_QUOTES | ENT_HTML5)
+                . htmlspecialchars($lang->sL('oauth2_client.be:oauth2Providers.notAvailable'), ENT_QUOTES | ENT_HTML5)
                 . '</span><br />';
         } else {
             $html .= '<a href="'
@@ -70,7 +69,7 @@ class ManageProvidersButtonRenderer
             $html .= ' <span>'
                 . htmlspecialchars(
                     $lang->sL(
-                        $languageFile . 'oauth2Providers.' . ($hasActiveProviders ? 'manageLinkTitle' : 'setupLinkTitle')
+                        'oauth2_client.be:oauth2Providers.'
                     ),
                     ENT_QUOTES | ENT_HTML5
                 )

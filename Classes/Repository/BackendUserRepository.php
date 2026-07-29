@@ -6,7 +6,6 @@ namespace Waldhacker\Oauth2Client\Repository;
 
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\ParameterType;
-use InvalidArgumentException;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
@@ -15,13 +14,12 @@ use Waldhacker\Oauth2Client\Database\Query\Restriction\Oauth2BeUserProviderConfi
 
 class BackendUserRepository
 {
-    private const OAUTH2_BE_CONFIG_TABLE = 'tx_oauth2_beuser_provider_configuration';
+    private const string OAUTH2_BE_CONFIG_TABLE = 'tx_oauth2_beuser_provider_configuration';
 
     public function __construct(
         private readonly DataHandler $dataHandler,
         private readonly ConnectionPool $connectionPool
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Exception
@@ -54,7 +52,7 @@ class BackendUserRepository
 
         // @todo: log warning if more than one user matches
         // Do not login if more than one user matches!
-        return empty($result) || empty($result[0]) || count($result) > 1 ? null : $result[0];
+        return $result === [] || empty($result[0]) || count($result) > 1 ? null : $result[0];
     }
 
     /**
@@ -62,11 +60,11 @@ class BackendUserRepository
      */
     public function persistIdentityForUser(string $provider, string $identifier, int $userid): void
     {
-        if (empty($provider)) {
-            throw new InvalidArgumentException('"provider" must not be empty', 1642867950);
+        if ($provider === '' || $provider === '0') {
+            throw new \InvalidArgumentException('"provider" must not be empty', 1642867950);
         }
-        if (empty($identifier)) {
-            throw new InvalidArgumentException('"identifier" must not be empty', 1642867951);
+        if ($identifier === '' || $identifier === '0') {
+            throw new \InvalidArgumentException('"identifier" must not be empty', 1642867951);
         }
 
         $cmd = [];

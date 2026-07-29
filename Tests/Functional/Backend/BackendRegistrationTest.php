@@ -424,7 +424,7 @@ class BackendRegistrationTest extends FunctionalTestCase
         self::assertTrue($responseData['response']->hasHeader('location'), 'assert: a redirect is made');
         self::assertEquals(
             '/typo3/login',
-            (new Uri($responseData['response']->getHeaderLine('location')))->getPath(),
+            new Uri($responseData['response']->getHeaderLine('location'))->getPath(),
             'assert: login redirect is made'
         );
         self::assertCount(0, $oauth2FrontendSessionData, 'assert: no oauth2 frontend session exists');
@@ -549,7 +549,7 @@ class BackendRegistrationTest extends FunctionalTestCase
         self::assertTrue($responseData['response']->hasHeader('location'), 'assert: a redirect is made');
         self::assertEquals(
             '/typo3/login',
-            (new Uri($responseData['response']->getHeaderLine('location')))->getPath(),
+            new Uri($responseData['response']->getHeaderLine('location'))->getPath(),
             'assert: login redirect is made'
         );
         self::assertCount(0, $oauth2FrontendSessionData, 'assert: no oauth2 frontend session exists');

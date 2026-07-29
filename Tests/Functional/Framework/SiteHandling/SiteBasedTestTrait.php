@@ -21,6 +21,7 @@ use TYPO3\CMS\Core\Configuration\SiteConfiguration;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\Internal\AbstractInstruction;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\Internal\ArrayValueInstruction;
+use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\Internal\InstructionInterface;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\Internal\TypoScriptInstruction;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 
@@ -38,7 +39,7 @@ trait SiteBasedTestTrait
      */
     protected static function failIfArrayIsNotEmpty(array $items): void
     {
-        if (empty($items)) {
+        if ($items === []) {
             return;
         }
 
@@ -61,10 +62,10 @@ trait SiteBasedTestTrait
         array $errorHandling = []
     ): void {
         $configuration = $site;
-        if (!empty($languages)) {
+        if ($languages !== []) {
             $configuration['languages'] = $languages;
         }
-        if (!empty($errorHandling)) {
+        if ($errorHandling !== []) {
             $configuration['errorHandling'] = $errorHandling;
         }
         $siteConfiguration = new SiteConfiguration(
@@ -144,7 +145,7 @@ trait SiteBasedTestTrait
         string $identifier,
         string $base,
         array $fallbackIdentifiers = [],
-        string $fallbackType = null
+        ?string $fallbackType = null
     ): array {
         $preset = $this->resolveLanguagePreset($identifier);
 
@@ -159,10 +160,10 @@ trait SiteBasedTestTrait
             'direction' => $preset['direction'] ?? '',
             'typo3Language' => $preset['iso'] ?? '',
             'flag' => $preset['iso'] ?? '',
-            'fallbackType' => $fallbackType ?? (empty($fallbackIdentifiers) ? 'strict' : 'fallback'),
+            'fallbackType' => $fallbackType ?? ($fallbackIdentifiers === [] ? 'strict' : 'fallback'),
         ];
 
-        if (!empty($fallbackIdentifiers)) {
+        if ($fallbackIdentifiers !== []) {
             $fallbackIds = array_map(
                 function (string $fallbackIdentifier) {
                     $preset = $this->resolveLanguagePreset($fallbackIdentifier);
@@ -220,7 +221,7 @@ trait SiteBasedTestTrait
         $baseConfiguration['errorHandler'] = $handler;
 
         return array_map(
-            static function (int $code) use ($baseConfiguration) {
+            static function (int $code) use ($baseConfiguration): array {
                 $baseConfiguration['errorCode'] = $code;
                 return $baseConfiguration;
             },
@@ -256,7 +257,7 @@ trait SiteBasedTestTrait
 
         foreach ($instructions as $instruction) {
             $identifier = $instruction->getIdentifier();
-            if (isset($modifiedInstructions[$identifier]) || $request->getInstruction($identifier) !== null) {
+            if (isset($modifiedInstructions[$identifier]) || $request->getInstruction($identifier) instanceof InstructionInterface) {
                 $modifiedInstructions[$identifier] = $this->mergeInstruction(
                     $modifiedInstructions[$identifier] ?? $request->getInstruction($identifier),
                     $instruction
@@ -276,7 +277,7 @@ trait SiteBasedTestTrait
      */
     protected function mergeInstruction(AbstractInstruction $current, AbstractInstruction $other): AbstractInstruction
     {
-        if (get_class($current) !== get_class($other)) {
+        if ($current::class !== $other::class) {
             throw new \LogicException('Cannot merge different instruction types', 1565863174);
         }
 

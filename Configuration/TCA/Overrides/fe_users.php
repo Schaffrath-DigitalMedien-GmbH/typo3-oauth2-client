@@ -16,9 +16,9 @@
 
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
-defined('TYPO3') or die();
+defined('TYPO3') || die();
 
-(static function () {
+(static function (): void {
     $languageFile = 'LLL:EXT:oauth2_client/Resources/Private/Language/locallang_be.xlf:';
 
     ExtensionManagementUtility::addTCAcolumns('fe_users', [

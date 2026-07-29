@@ -14,15 +14,14 @@ use Waldhacker\Oauth2Client\Service\Oauth2ProviderManager;
 
 class Oauth2ProvidersElement extends AbstractFormElement
 {
-    private const BE_USERS_TABLE = 'be_users';
-    private const FE_USERS_TABLE = 'fe_users';
+    private const string BE_USERS_TABLE = 'be_users';
+    private const string FE_USERS_TABLE = 'fe_users';
 
     public function __construct(
         protected IconFactory $iconFactory,
         private readonly UriBuilder $uriBuilder,
         private readonly Oauth2ProviderManager $oauth2ProviderManager,
-    ) {
-    }
+    ) {}
 
     /**
      * @throws RouteNotFoundException
@@ -32,21 +31,19 @@ class Oauth2ProvidersElement extends AbstractFormElement
         $resultArray = $this->initializeResultArray();
         $tableName = $this->data['tableName'];
 
-        if (!($tableName === self::BE_USERS_TABLE || $tableName === self::FE_USERS_TABLE)) {
+        if ($tableName !== self::BE_USERS_TABLE && $tableName !== self::FE_USERS_TABLE) {
             return $resultArray;
         }
 
-        $languageFile = 'LLL:EXT:oauth2_client/Resources/Private/Language/locallang_be.xlf:';
-        $coreLanguageFile = 'LLL:EXT:core/Resources/Private/Language/locallang_core.xlf:';
 
         $html = $childHtml = [];
         $lang = $this->getLanguageService();
         $enabledLabel = htmlspecialchars(
-            $lang->sL($languageFile . 'labels.oauth2.enabled'),
+            $lang->sL('oauth2_client.be:labels.oauth2.enabled'),
             ENT_QUOTES | ENT_HTML5
         );
         $disabledLabel = htmlspecialchars(
-            $lang->sL($languageFile . 'labels.oauth2.disabled'),
+            $lang->sL('oauth2_client.be:labels.oauth2.disabled'),
             ENT_QUOTES | ENT_HTML5
         );
         $status = '<span class="badge badge-danger me-2 t3js-oauth2-status-label" data-alternative-label="'
@@ -104,40 +101,40 @@ class Oauth2ProvidersElement extends AbstractFormElement
                     );
                     $childHtml[] = '<a href="' . $deleteThis . '" ';
                     $childHtml[] = ' class="btn btn-default btn-sm pull-right t3js-modal-trigger"';
-                    $childHtml[] = ' data-title="' .
-                                   htmlspecialchars(
+                    $childHtml[] = ' data-title="'
+                                   . htmlspecialchars(
                                        sprintf(
-                                           $lang->sL($languageFile . 'buttons.deactivateProvider'),
+                                           $lang->sL('oauth2_client.be:buttons.deactivateProvider'),
                                            $lang->sL($activeProvider['providerConfiguration']->getLabel())
                                        ),
                                        ENT_QUOTES | ENT_HTML5
-                                   ) .
-                                   '"';
-                    $childHtml[] = ' data-bs-content="' .
-                                   htmlspecialchars(
+                                   )
+                                   . '"';
+                    $childHtml[] = ' data-bs-content="'
+                                   . htmlspecialchars(
                                        sprintf(
-                                           $lang->sL($languageFile . 'buttons.deactivateProvider.confirmation.text'),
+                                           $lang->sL('oauth2_client.be:buttons.deactivateProvider.confirmation.text'),
                                            $lang->sL($activeProvider['providerConfiguration']->getLabel())
                                        ),
                                        ENT_QUOTES | ENT_HTML5
-                                   ) .
-                                   '"';
+                                   )
+                                   . '"';
                     $childHtml[] = ' data-button-close-text="'
-                        . htmlspecialchars($lang->sL($coreLanguageFile . 'labels.cancel'), ENT_QUOTES | ENT_HTML5)
+                        . htmlspecialchars($lang->sL('core.core:labels.cancel'), ENT_QUOTES | ENT_HTML5)
                         . '"';
                     $childHtml[] = ' data-button-ok-text="'
-                        . htmlspecialchars($lang->sL($coreLanguageFile . 'labels.deactivate'), ENT_QUOTES | ENT_HTML5)
+                        . htmlspecialchars($lang->sL('core.core:labels.deactivate'), ENT_QUOTES | ENT_HTML5)
                         . '"';
                     $childHtml[] = ' data-severity="warning"';
-                    $childHtml[] = ' title="' .
-                                   htmlspecialchars(
+                    $childHtml[] = ' title="'
+                                   . htmlspecialchars(
                                        sprintf(
-                                           $lang->sL($languageFile . 'buttons.deactivateProvider'),
+                                           $lang->sL('oauth2_client.be:buttons.deactivateProvider'),
                                            $lang->sL($activeProvider['providerConfiguration']->getLabel())
                                        ),
                                        ENT_QUOTES | ENT_HTML5
-                                   ) .
-                                   '"';
+                                   )
+                                   . '"';
                     $childHtml[] = '>';
                     $childHtml[] = $this->iconFactory->getIcon('actions-delete', IconSize::SMALL)->render('inline');
                     $childHtml[] = '</a>';

@@ -2,9 +2,9 @@
 
 use Waldhacker\Oauth2Client\Backend\SiteConfig\ConfiguredFrontendProvidersItemsProcFunc;
 
-defined('TYPO3') or die();
+defined('TYPO3') || die();
 
-(static function () {
+(static function (): void {
     $languageFile = 'LLL:EXT:oauth2_client/Resources/Private/Language/locallang_be.xlf:';
 
     $GLOBALS['SiteConfiguration']['site_language']['columns']['enabled_oauth2_providers'] = [
@@ -35,7 +35,7 @@ defined('TYPO3') or die();
             'type' => 'select',
             'renderType' => 'selectSingle',
             'items' => [
-                ['', '']
+                ['', ''],
             ],
             'foreign_table' => 'pages',
             'foreign_table_where' => ' AND module=\'fe_users\' AND l10n_parent=0 ORDER BY pid, sorting',

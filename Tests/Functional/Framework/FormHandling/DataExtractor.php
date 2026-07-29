@@ -20,12 +20,7 @@ namespace Waldhacker\Oauth2Client\Tests\Functional\Framework\FormHandling;
 
 class DataExtractor
 {
-    private $html;
-
-    public function __construct(string $html)
-    {
-        $this->html = $html;
-    }
+    public function __construct(private readonly string $html) {}
 
     public function getFormData(string $query = '//form'): array
     {
@@ -47,7 +42,7 @@ class DataExtractor
             parse_str($actionQuery, $queryArray);
             $data['actionQueryData'] = $queryArray;
 
-            [$actionUrl, ] = explode('?', $action);
+            [$actionUrl] = explode('?', $action);
             $data['actionUrl'] = $actionUrl;
 
             break;

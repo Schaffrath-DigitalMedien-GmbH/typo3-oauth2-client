@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Waldhacker\Oauth2Client\Controller\Frontend;
 
 use Doctrine\DBAL\Exception;
+use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
+use League\OAuth2\Client\Token\AccessToken;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -16,6 +18,7 @@ use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
 use TYPO3\CMS\Core\Context\UserAspect;
 use TYPO3\CMS\Core\Session\Backend\Exception\SessionNotCreatedException;
 use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Site\Entity\SiteLanguage;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
 use Waldhacker\Oauth2Client\Repository\FrontendUserRepository;
 use Waldhacker\Oauth2Client\Service\Oauth2ProviderManager;
@@ -40,8 +43,7 @@ class RegistrationController implements LoggerAwareInterface
         private readonly SiteService $siteService,
         private readonly ResponseFactoryInterface $responseFactory,
         private readonly Context $context
-    ) {
-    }
+    ) {}
 
     /**
      * @throws SessionNotCreatedException
@@ -58,7 +60,7 @@ class RegistrationController implements LoggerAwareInterface
 
         if (
             !$frontendUser->isLoggedIn()
-            || empty($providerId)
+            || ($providerId === '' || $providerId === '0')
             || !$this->oauth2ProviderManager->hasFrontendProvider($providerId, $request)
             || !in_array($action, self::$allowedActions, true)
         ) {
@@ -108,7 +110,7 @@ class RegistrationController implements LoggerAwareInterface
         $warningRedirectUri = empty($originalRequestData)
             ? $this->siteService->getBaseUri()
             : $originalRequestData['uri'];
-        if (empty($code) || empty($state)) {
+        if ($code === '' || $code === '0' || ($state === '' || $state === '0')) {
             return $this->redirectWithWarning($warningRedirectUri, $request);
         }
 
@@ -122,14 +124,14 @@ class RegistrationController implements LoggerAwareInterface
             $this->buildCallbackUri($providerId, $request),
             $request
         );
-        if ($provider === null) {
+        if (!$provider instanceof AbstractProvider) {
             return $this->redirectWithWarning($warningRedirectUri, $request);
         }
         $accessToken = $this->oauth2Service->buildGetResourceOwnerAccessToken(
             $provider,
             $code
         );
-        if ($accessToken === null) {
+        if (!$accessToken instanceof AccessToken) {
             return $this->redirectWithWarning($warningRedirectUri, $request);
         }
         $remoteUser = $this->oauth2Service->getResourceOwner($provider, $accessToken);
@@ -138,7 +140,7 @@ class RegistrationController implements LoggerAwareInterface
         if ($remoteUser instanceof ResourceOwnerInterface) {
             try {
                 $this->frontendUserRepository->persistIdentityForUser($providerId, (string)$remoteUser->getId(), $userId);
-            } catch (Exception | AspectNotFoundException) {
+            } catch (Exception|AspectNotFoundException) {
                 return $this->redirectWithWarning($warningRedirectUri, $request);
             }
         } else {
@@ -165,7 +167,7 @@ class RegistrationController implements LoggerAwareInterface
             [
                 'oauth2-provider' => $providerId,
                 'tx_oauth2client' => [
-                    'action' => 'verify'
+                    'action' => 'verify',
                 ],
             ],
             $request
@@ -193,7 +195,7 @@ class RegistrationController implements LoggerAwareInterface
         /** @var Site|null $site */
         $site = $this->siteService->getSite();
         $language = $this->siteService->getLanguage();
-        if ($site === null || $language === null) {
+        if ($site === null || !$language instanceof SiteLanguage) {
             return false;
         }
 

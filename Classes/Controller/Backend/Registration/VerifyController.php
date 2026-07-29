@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Waldhacker\Oauth2Client\Controller\Backend\Registration;
 
 use Doctrine\DBAL\Exception;
+use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
+use League\OAuth2\Client\Token\AccessToken;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -21,7 +23,6 @@ use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Session\Backend\Exception\SessionNotCreatedException;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Waldhacker\Oauth2Client\Controller\Backend\AbstractBackendController;
 use Waldhacker\Oauth2Client\Repository\BackendUserRepository;
 use Waldhacker\Oauth2Client\Service\Oauth2ProviderManager;
 use Waldhacker\Oauth2Client\Service\Oauth2Service;
@@ -36,9 +37,9 @@ readonly class VerifyController
         private UriBuilder $uriBuilder,
         private ResponseFactoryInterface $responseFactory,
         private Oauth2ProviderManager $oauth2ProviderManager,
-        private Context $context
-    ) {
-    }
+        private Context $context,
+        private FlashMessageService $flashMessageService
+    ) {}
 
     /**
      * @throws AspectNotFoundException
@@ -49,7 +50,7 @@ readonly class VerifyController
     public function __invoke(ServerRequestInterface $request): ResponseInterface
     {
         $postParameters = is_array($request->getParsedBody()) ? $request->getParsedBody() : [];
-        if (empty($postParameters)) {
+        if ($postParameters === []) {
             return $this->redirectWithWarning($request);
         }
         $providerId = (string)($postParameters['oauth2-provider'] ?? '');
@@ -60,9 +61,9 @@ readonly class VerifyController
 
         if (
             !$backendUser->isLoggedIn()
-            || empty($providerId)
-            || empty($code)
-            || empty($state)
+            || ($providerId === '' || $providerId === '0')
+            || ($code === '' || $code === '0')
+            || ($state === '' || $state === '0')
             || !$this->oauth2ProviderManager->hasBackendProvider($providerId)
         ) {
             return $this->redirectWithWarning($request);
@@ -83,14 +84,14 @@ readonly class VerifyController
             $callbackUrl,
             $request
         );
-        if ($provider === null) {
+        if (!$provider instanceof AbstractProvider) {
             return $this->redirectWithWarning($request);
         }
         $accessToken = $this->oauth2Service->buildGetResourceOwnerAccessToken(
             $provider,
             $code
         );
-        if ($accessToken === null) {
+        if (!$accessToken instanceof AccessToken) {
             return $this->redirectWithWarning($request);
         }
         $remoteUser = $this->oauth2Service->getResourceOwner($provider, $accessToken);
@@ -106,11 +107,11 @@ readonly class VerifyController
             return $this->redirectWithWarning($request);
         }
 
-        $languageFile = 'LLL:EXT:oauth2_client/Resources/Private/Language/locallang_be.xlf:';
+
         $this->sessionManager->removeSessionData($request);
         $this->addFlashMessage(
-            $this->getLanguageService()->sL($languageFile . 'flash.providerConfigurationAdded.description'),
-            $this->getLanguageService()->sL($languageFile . 'flash.providerConfigurationAdded.title'),
+            $this->getLanguageService()->sL('oauth2_client.be:flash.providerConfigurationAdded.description'),
+            $this->getLanguageService()->sL('oauth2_client.be:flash.providerConfigurationAdded.title'),
             ContextualFeedbackSeverity::OK
         );
 
@@ -126,11 +127,11 @@ readonly class VerifyController
      */
     private function redirectWithWarning(ServerRequestInterface $request): ResponseInterface
     {
-        $languageFile = 'LLL:EXT:oauth2_client/Resources/Private/Language/locallang_be.xlf:';
+
         $this->sessionManager->removeSessionData($request);
         $this->addFlashMessage(
-            $this->getLanguageService()->sL($languageFile . 'flash.providerConfigurationFailed.description'),
-            $this->getLanguageService()->sL($languageFile . 'flash.providerConfigurationFailed.title'),
+            $this->getLanguageService()->sL('oauth2_client.be:flash.providerConfigurationFailed.description'),
+            $this->getLanguageService()->sL('oauth2_client.be:flash.providerConfigurationFailed.title'),
             ContextualFeedbackSeverity::WARNING
         );
 
@@ -146,7 +147,7 @@ readonly class VerifyController
         string $title = '',
         ContextualFeedbackSeverity $severity = ContextualFeedbackSeverity::INFO
     ): void {
-        $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
+        $flashMessageService = $this->flashMessageService;
         $flashMessageService->getMessageQueueByIdentifier()->enqueue(
             GeneralUtility::makeInstance(FlashMessage::class, $message, $title, $severity, true)
         );

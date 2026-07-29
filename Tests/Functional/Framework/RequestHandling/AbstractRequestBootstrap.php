@@ -29,17 +29,13 @@ use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequestCon
 
 abstract class AbstractRequestBootstrap
 {
-    protected string $documentRoot;
-    protected array $requestArguments;
     private ClassLoader $classLoader;
     protected InternalRequestContext $context;
     protected ExtendedInternalRequest $request;
     private array $result = ['status' => 'failure', 'content' => null, 'error' => null];
 
-    public function __construct(string $documentRoot, string $vendorPath, array $requestArguments = null)
+    public function __construct(protected string $documentRoot, string $vendorPath, protected ?array $requestArguments = null)
     {
-        $this->documentRoot = $documentRoot;
-        $this->requestArguments = $requestArguments;
         $this->initialize($vendorPath);
         $this->setGlobalVariables();
         register_shutdown_function([$this, 'output']);
@@ -72,7 +68,7 @@ abstract class AbstractRequestBootstrap
             $container = Bootstrap::init($this->classLoader);
 
             $override = $this->context->getGlobalSettings() ?? [];
-            foreach ($GLOBALS as $k => $v) {
+            foreach (array_keys($GLOBALS) as $k) {
                 if (isset($override[$k])) {
                     ArrayUtility::mergeRecursiveWithOverrule($GLOBALS[$k], $override[$k]);
                 }
@@ -84,11 +80,11 @@ abstract class AbstractRequestBootstrap
 
             $container->get($applicationClass)->run();
             $this->result['status'] = 'success';
-            $this->result['content'] = static::getContent();
+            $this->result['content'] = $this->getContent();
         } catch (\Throwable $exception) {
             $this->result['error'] = $exception->__toString();
             $this->result['exception'] = [
-                'type' => get_class($exception),
+                'type' => $exception::class,
                 'message' => $exception->getMessage(),
                 'code' => $exception->getCode(),
             ];
@@ -115,7 +111,7 @@ abstract class AbstractRequestBootstrap
     /**
      * @return string|array|null
      */
-    private static function getContent()
+    private function getContent()
     {
         $content = ob_get_contents();
         $content = json_decode($content, true);

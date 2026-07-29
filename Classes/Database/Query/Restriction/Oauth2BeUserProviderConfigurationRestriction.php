@@ -18,9 +18,9 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class Oauth2BeUserProviderConfigurationRestriction implements QueryRestriction, EnforceableQueryRestriction
 {
-    private const OAUTH2_BE_TABLE = 'tx_oauth2_beuser_provider_configuration';
-    private int $backendUserId;
-    private bool $isAdmin;
+    private const string OAUTH2_BE_TABLE = 'tx_oauth2_beuser_provider_configuration';
+    private int $backendUserId = 0;
+    private bool $isAdmin = false;
 
     /**
      * @throws AspectNotFoundException
@@ -28,10 +28,7 @@ class Oauth2BeUserProviderConfigurationRestriction implements QueryRestriction, 
     public function __construct(?Context $context = null)
     {
         /** @var Context $context */
-        $context = $context ?? GeneralUtility::makeInstance(Context::class);
-
-        $this->backendUserId = 0;
-        $this->isAdmin = false;
+        $context ??= GeneralUtility::makeInstance(Context::class);
         if ($context->hasAspect('backend.user')) {
             $this->backendUserId = (int)$context->getPropertyFromAspect('backend.user', 'id');
             $this->isAdmin = $context->getPropertyFromAspect('backend.user', 'isAdmin');

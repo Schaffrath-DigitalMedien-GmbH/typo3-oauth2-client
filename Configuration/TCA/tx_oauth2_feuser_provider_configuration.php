@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the OAuth2 Client extension for TYPO3
  * - (c) 2021 Waldhacker UG
@@ -13,17 +15,16 @@
  *
  * The TYPO3 project - inspiring people to share!
  */
-
 return [
     'ctrl' => [
-        'title' =>
-            'LLL:EXT:oauth2_client/Resources/Private/Language/locallang_be.xlf:tx_oauth2_feuser_provider_configuration',
+        'title'
+            => 'LLL:EXT:oauth2_client/Resources/Private/Language/locallang_be.xlf:tx_oauth2_feuser_provider_configuration',
         'label' => 'provider',
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
         'hideTable' => 1,
         'typeicon_classes' => [
-            'default' => 'actions-key'
+            'default' => 'actions-key',
         ],
         'enablecolumns' => [
             'fe_user' => 'parentid',
@@ -32,28 +33,28 @@ return [
             'ignoreWebMountRestriction' => true,
             'ignoreRootLevelRestriction' => true,
         ],
-        'rootLevel' => 1
+        'rootLevel' => 1,
     ],
 
     'columns' => [
         'parentid' => [
             'config' => [
-                'type' => 'passthrough'
-            ]
+                'type' => 'passthrough',
+            ],
         ],
         'provider' => [
             'label' => 'Provider',
             'config' => [
                 'type' => 'input',
-                'readOnly' => true
-            ]
+                'readOnly' => true,
+            ],
         ],
         'identifier' => [
             'label' => 'Identifier',
             'config' => [
                 'type' => 'input',
-                'readOnly' => true
-            ]
+                'readOnly' => true,
+            ],
         ],
     ],
 

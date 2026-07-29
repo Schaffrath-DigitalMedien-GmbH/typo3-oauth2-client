@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
-defined('TYPO3') or die();
+defined('TYPO3') || die();
 
 ExtensionManagementUtility::addTCAcolumns('be_users', [
     'tx_oauth2_client_configs' => [
@@ -19,18 +21,14 @@ ExtensionManagementUtility::addTCAcolumns('be_users', [
 ]);
 ExtensionManagementUtility::addToAllTCAtypes('be_users', 'tx_oauth2_client_configs', '', 'before:avatar');
 
-$version = VersionNumberUtility::convertVersionStringToArray(VersionNumberUtility::getNumericTypo3Version());
-if ($version['version_main'] >= 14) {
-    // TYPO3 v14 renders user settings through FormEngine (see ManageProvidersButtonElement).
-    ExtensionManagementUtility::addUserSetting(
-        'tx_oauth2_client_configs',
-        [
-            'label' => 'LLL:EXT:oauth2_client/Resources/Private/Language/locallang_be.xlf:userSettings.label',
-            'config' => [
-                'type' => 'user',
-                'renderType' => 'oauth2manageprovidersbutton',
-            ],
+ExtensionManagementUtility::addUserSetting(
+    'tx_oauth2_client_configs',
+    [
+        'label' => 'LLL:EXT:oauth2_client/Resources/Private/Language/locallang_be.xlf:userSettings.label',
+        'config' => [
+            'type' => 'user',
+            'renderType' => 'oauth2manageprovidersbutton',
         ],
-        'after:mfaProviders'
-    );
-}
+    ],
+    'after:mfaProviders'
+);
