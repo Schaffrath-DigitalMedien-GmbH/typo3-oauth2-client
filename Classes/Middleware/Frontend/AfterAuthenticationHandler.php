@@ -15,6 +15,7 @@ use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\Exception\AspectNotFoundException;
 use TYPO3\CMS\Core\Context\UserAspect;
 use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Session\Backend\Exception\SessionNotCreatedException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Authentication\FrontendUserAuthentication;
@@ -138,7 +139,8 @@ class AfterAuthenticationHandler implements MiddlewareInterface
             $userIsLoggedIn = $frontendUser instanceof FrontendUserAuthentication
                 && $frontendUserAspect->isLoggedIn();
             if ($userIsLoggedIn) {
-                $response = $request->getAttribute('frontend.user')->appendCookieToResponse($response);
+                $normalizedParams = $request->getAttribute('normalizedParams') ?? NormalizedParams::createFromRequest($request);
+                $response = $request->getAttribute('frontend.user')->appendCookieToResponse($response, $normalizedParams);
             }
 
             return $this->sessionManager->appendRemoveOAuth2CookieToResponse($response, $request);
